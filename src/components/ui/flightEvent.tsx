@@ -8,12 +8,12 @@ export default function FlightEvent({ origin, destination, airline, departureTim
   const day = departureTime.getDate()
   return (
     <div className="plasmo-inline-flex plasmo-justify-start plasmo-items-start plasmo-gap-6">
-      <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
+      <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0 plasmo-w-12 ">
         <span className="plasmo-text-black plasmo-text-p plasmo-font-normal">{month}</span>
         <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none">{day}</span>
       </div>
 
-      <div className="plasmo-w-72 plasmo-h-28 plasmo-relative plasmo-bg-background plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden">
+      <div className="plasmo-w-72 plasmo-h-28 plasmo-relative plasmo-bg-background-subtle plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden">
         
         {/* Top row — route + icon */}
         <div className="plasmo-absolute plasmo-top-[7px] plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-flex plasmo-justify-between">
@@ -34,7 +34,7 @@ export default function FlightEvent({ origin, destination, airline, departureTim
               )}
             </span>
           </div>
-          <Button size="xs">
+          <Button size="xs" onClick={() => window.open(confirmationLink, "_blank")}>
             Confirmation
           </Button>
         </div>

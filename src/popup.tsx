@@ -5,6 +5,9 @@ import { Navbar } from "~/navbar"
 import "style.css"
 
 import FlightEvent from "~/components/ui/flightEvent"
+import Gap from "~/components/gap"
+import AccomodationEvent from "~/components/ui/accomodationEvent"
+import { TimeDatePicker } from "~components/ui/timeDatePicker"
 
 type Event = {
   id: string
@@ -45,6 +48,8 @@ function TimelineItem({ item }: { item: Event }) {
 
 export default function IndexPopup() {
   const [timeline, setTimeline] = useState<Event[] | null>(null)
+  const [departure, setDeparture] = React.useState<Date | undefined>(undefined)
+
 
   void cssText
 
@@ -69,7 +74,7 @@ export default function IndexPopup() {
       <Navbar />
 
       <main className="plasmo-p-4">
-        <div className="plasmo-flex plasmo-flex-col plasmo-gap-10">
+        {/* <div className="plasmo-flex plasmo-flex-col plasmo-gap-2">
         <FlightEvent
           origin="MIA"
           destination="BCN"
@@ -79,43 +84,17 @@ export default function IndexPopup() {
           confirmationLink="https://www.aa.com/"
           militaryTime = {true}
         />
-        <FlightEvent
-          origin="MIA"
-          destination="BCN"
-          airline="American Airlines"
-          departureTime={new Date("2024-07-12T22:00:00")}
-          arrivalTime={new Date("2024-07-13T13:35:00")}
-          confirmationLink="https://www.aa.com/"
-          militaryTime = {true}
+        <Gap precedingArrivalTime={new Date("2024-07-13T13:35:00")} followingDepartureTime={new Date("2024-07-13T16:00:00")} />
+        <AccomodationEvent
+          name="Hotel Arts Barcelona"
+          checkIn={new Date("2024-07-13T16:00:00")}
+          checkOut={new Date("2024-07-16T11:00:00")}
+          location="Barcelona, Spain"
+          confirmationLink="https://www.hotelartsbarcelona.com/"
+          militaryTime={true}
         />
-        </div>
-        {/* {!timeline ? (
-          <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-gap-4 plasmo-py-8">
-            <h3 className="plasmo-text-2xl plasmo-font-semibold">Create New Trip</h3>
-            <p className="plasmo-text-sm plasmo-text-gray-500">Start building a timeline with flights and stays.</p>
-            <div className="plasmo-flex plasmo-gap-3 plasmo-mt-3">
-              <button className="plasmo-px-4 plasmo-py-2 plasmo-rounded plasmo-bg-blue-600 plasmo-text-white" onClick={onCreate}>Create new trip</button>
-              <button className="plasmo-px-3 plasmo-py-2 plasmo-rounded plasmo-border" onClick={() => addEvent("airbnb")}>Add sample stay</button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div className="plasmo-flex plasmo-justify-between plasmo-items-center plasmo-mb-4">
-              <h3 className="plasmo-text-xl plasmo-font-semibold">My Trip</h3>
-              <div className="plasmo-flex plasmo-gap-2">
-                <button className="plasmo-px-3 plasmo-py-1 plasmo-rounded plasmo-border" onClick={() => setTimeline(null)}>Reset</button>
-                <button className="plasmo-px-3 plasmo-py-1 plasmo-rounded plasmo-border" onClick={() => addEvent("flight")}>+ Flight</button>
-                <button className="plasmo-px-3 plasmo-py-1 plasmo-rounded plasmo-border" onClick={() => addEvent("airbnb")}>+ Stay</button>
-              </div>
-            </div>
-
-            <ul className="plasmo-space-y-3">
-              {timeline.map((ev) => (
-                <TimelineItem key={ev.id} item={ev} />
-              ))}
-            </ul>
-          </div>
-        )} */}
+        </div> */}
+        <TimeDatePicker label="Departure" value={departure} onChange={setDeparture} />
       </main>
     </div>
   )

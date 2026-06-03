@@ -25,6 +25,7 @@ const buttonVariants = cva(
         sm: "plasmo-h-9 plasmo-rounded-md plasmo-px-3",
         lg: "plasmo-h-11 plasmo-rounded-md plasmo-px-8",
         icon: "plasmo-h-10 plasmo-w-10",
+        "icon-xs": "plasmo-h-6 plasmo-w-6",
       },
     },
     defaultVariants: {
@@ -38,11 +39,12 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  render?: React.ReactElement
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  ({ className, variant, size, asChild = false, render, ...props }, ref) => {
+    const Comp = render ? Slot : asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
