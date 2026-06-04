@@ -20,9 +20,9 @@ export default function AccomodationEvent({ checkIn, checkOut, name, location, m
 
   return (
     <div className="plasmo-inline-flex plasmo-justify-start plasmo-items-start plasmo-gap-6">
-      <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
+      <div className="plasmo-flex plasmo-flex-col plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
         <span className="plasmo-text-black plasmo-text-p plasmo-font-normal">{checkInMonth}</span>
-        <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none plasmo-w-12 ">{checkInDay}-{checkOutDay}</span>
+        <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none plasmo-w-6">{checkInDay}</span>
       </div>
 
       <div className="plasmo-w-72 plasmo-relative plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden" style={{ height: "180px" }}>

@@ -17,8 +17,35 @@ export type AccomodationEventProps = {
   confirmationLink?: string
 }
 
-export type DatePickerInputProps = {
+export type DateTimeInputProps = {
   label: string
   value?: Date
   onChange: (date: Date | undefined) => void
+}
+
+export type AirportComboboxProps = {
+  label: string
+  value?: string   // IATA code e.g. "MIA"
+  onChange: (iata: string) => void
+  placeholder?: string
+}
+
+export type Airport = {
+  iata: string
+  name: string
+  city: string
+  country: string
+}
+
+export type AirlineEntry = {
+  icao: string
+  name: string
+  domain: string
+}
+
+export type AirlineComboboxProps = {
+  label: string
+  value?: string
+  onChange: (iata: string) => void
+  placeholder?: string
 }

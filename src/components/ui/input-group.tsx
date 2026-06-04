@@ -22,7 +22,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
         "has-[>[data-align=block-end]]:plasmo-h-auto has-[>[data-align=block-end]]:plasmo-flex-col has-[>[data-align=block-end]]:[&>input]:plasmo-pt-3",
 
         // Focus state.
-        "has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-ring has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-1",
+        "has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-ring has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-2",
 
         // Error state.
         "has-[[data-slot][aria-invalid=true]]:plasmo-ring-destructive/20 has-[[data-slot][aria-invalid=true]]:plasmo-border-destructive dark:has-[[data-slot][aria-invalid=true]]:plasmo-ring-destructive/40",

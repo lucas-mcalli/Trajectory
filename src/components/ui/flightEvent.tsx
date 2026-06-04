@@ -8,7 +8,7 @@ export default function FlightEvent({ origin, destination, airline, departureTim
   const day = departureTime.getDate()
   return (
     <div className="plasmo-inline-flex plasmo-justify-start plasmo-items-start plasmo-gap-6">
-      <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0 plasmo-w-12 ">
+      <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0 plasmo-w-6">
         <span className="plasmo-text-black plasmo-text-p plasmo-font-normal">{month}</span>
         <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none">{day}</span>
       </div>

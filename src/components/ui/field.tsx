@@ -53,7 +53,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const fieldVariants = cva(
-  "plasmo-group/field data-[invalid=true]:plasmo-text-destructive plasmo-flex plasmo-w-full plasmo-gap-3",
+  "plasmo-group/field data-[invalid=true]:plasmo-text-destructive plasmo-flex plasmo-w-full plasmo-gap-1.5",
   {
     variants: {
       orientation: {
