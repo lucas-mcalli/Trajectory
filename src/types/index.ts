@@ -8,7 +8,7 @@ export type FlightEventProps = {
   confirmationLink?: string
 }
 
-export type AccomodationEventProps = {
+export type StayEventProps = {
   name: string
   checkIn: Date
   checkOut: Date
@@ -21,6 +21,7 @@ export type DateTimeInputProps = {
   label: string
   value?: Date
   onChange: (date: Date | undefined) => void
+  militaryTime?: boolean
 }
 
 export type AirportComboboxProps = {
@@ -48,4 +49,9 @@ export type AirlineComboboxProps = {
   value?: string
   onChange: (iata: string) => void
   placeholder?: string
+}
+
+export type CalendarState = {
+  month: number
+  year: number
 }

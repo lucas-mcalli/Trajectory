@@ -1,4 +1,4 @@
-import { determineGapHeight } from "../helpers"
+import { determineGapHeight } from "../../helpers"
 
 export default function Gap({precedingArrivalTime, followingDepartureTime}: {precedingArrivalTime: Date, followingDepartureTime: Date}) {
   const hours = Math.round((followingDepartureTime.getTime() - precedingArrivalTime.getTime()) / (1000 * 60 * 60))

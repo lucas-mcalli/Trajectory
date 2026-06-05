@@ -83,15 +83,15 @@ export default function AirportCombobox({
   }
 
   return (
-    <Field className="plasmo-w-full plsamo-flex plasmo-flex-col">
+    <Field className="plasmo-w-full plasmo-flex plasmo-flex-col">
       <FieldLabel>{label}</FieldLabel>
 
-      <div ref={containerRef} className="plasmo-relative">
+      <div ref={containerRef} className="plasmo-relative plasmo-flex-1 plasmo-min-w-0">
         {/* Trigger */}
         <div
-          onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus(), 0) }}
+          onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0) }}
           className={cn(
-            "plasmo-flex plasmo-h-9 plasmo-w-full plasmo-items-center plasmo-justify-between",
+            "plasmo-flex plasmo-h-9 plasmo-w-full plasmo-min-w-0 plasmo-items-center plasmo-justify-between",
             "plasmo-rounded-md plasmo-border plasmo-border-input plasmo-bg-background",
             "plasmo-px-3 plasmo-py-2 plasmo-text-sm plasmo-cursor-pointer",
             "plasmo-transition-all plasmo-ease-out plasmo-duration-100",
@@ -104,7 +104,7 @@ export default function AirportCombobox({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={selected ? `${selected.iata}` : placeholder}
-              className="plasmo-flex-1 plasmo-bg-transparent plasmo-outline-none plasmo-text-sm plasmo-text-foreground placeholder:plasmo-text-muted-foreground"
+              className="plasmo-flex-1p plasmo-min-w-0 plasmo-bg-transparent plasmo-outline-none plasmo-text-sm plasmo-text-foreground placeholder:plasmo-text-muted-foreground"
               onKeyDown={(e) => {
                 if (e.key === "Escape") { setOpen(false); setQuery("") }
                 if (e.key === "Enter" && results.length > 0) handleSelect(results[0])
@@ -132,7 +132,7 @@ export default function AirportCombobox({
         {/* Dropdown */}
         {open && (
           <div className={cn(
-            "plasmo-absolute plasmo-z-50 plasmo-mt-1 plasmo-w-full",
+            "plasmo-absolute plasmo-z-50 plasmo-mt-1 plasmo-w-full plasmo-min-w-0",
             "plasmo-rounded-md plasmo-border plasmo-border-border plasmo-bg-background",
             "plasmo-shadow-md plasmo-overflow-hidden"
           )}>

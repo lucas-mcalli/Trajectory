@@ -7,9 +7,9 @@ export const formatTime = (date: Date, militaryTime: boolean) =>
 
 export const determineGapHeight = (precedingArrivalTime: Date, followingDepartureTime: Date): number => {
   const gapMinutes = (followingDepartureTime.getTime() - precedingArrivalTime.getTime()) / (1000 * 60)
-  const minHeight = 32
-  const maxHeight = 300
-  const maxGapMinutes = 720 // 12 hours — gaps longer than this hit the ceiling
+  const minHeight = 40
+  const maxHeight = 120
+  const maxGapMinutes = 480
 
   return Math.min(maxHeight, Math.max(minHeight, (gapMinutes / maxGapMinutes) * maxHeight))
 }

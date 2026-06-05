@@ -1,13 +1,14 @@
 import React, { useState } from "react"
 import cssText from "data-text:~style.css"
-import { Navbar } from "~/navbar"
+import { Navbar } from "~components/ui/navbar"
 // @ts-ignore
 import "style.css"
 
 import FlightEvent from "~/components/ui/flightEvent"
-import Gap from "~/components/gap"
-import AccomodationEvent from "~/components/ui/accomodationEvent"
+import Gap from "~components/ui/gap"
+import AccomodationEvent from "~components/ui/stayEvent"
 import FlightForm from "~/components/ui/flightForm"
+import AccomodationForm from "~components/ui/stayForm"
 
 type Event = {
   id: string
@@ -48,7 +49,6 @@ function TimelineItem({ item }: { item: Event }) {
 
 export default function IndexPopup() {
   const [timeline, setTimeline] = useState<Event[] | null>(null)
-  const [departure, setDeparture] = React.useState<Date | undefined>(undefined)
 
 
   void cssText
@@ -70,32 +70,33 @@ export default function IndexPopup() {
   }
 
   return (
-    <div className="plasmo-h-[600px] plasmo-w-[750px] plasmo-rounded-md plasmo-overflow-y-auto plasmo-bg-white plasmo-text-slate-900">
+    <div style={{scrollbarWidth: "none" }} className="plasmo-h-[600px] plasmo-w-[775px] plasmo-rounded-md plasmo-flex plasmo-flex-col plasmo-overflow-hidden plasmo-bg-white plasmo-text-slate-900">
       <Navbar />
 
-      <main className="plasmo-p-4 plasmo-pr-6 plasmo-flex-1 plasmo-overflow-y-auto">
-        <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-8">
+      <main style={{scrollbarWidth: "none" }} className="plasmo-p-4 plasmo-pr-5 plasmo-flex-1 plasmo-overflow-y-auto">
+        <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-4">
           <div className="plasmo-flex plasmo-flex-col plasmo-gap-2">
-          <FlightEvent
-            origin="MIA"
-            destination="BCN"
-            airline="American Airlines"
-            departureTime={new Date("2024-07-12T22:00:00")}
-            arrivalTime={new Date("2024-07-13T13:35:00")}
-            confirmationLink="https://www.aa.com/"
-            militaryTime = {true}
-          />
-          <Gap precedingArrivalTime={new Date("2024-07-13T13:35:00")} followingDepartureTime={new Date("2024-07-13T16:00:00")} />
-          <AccomodationEvent
-            name="Hotel Arts Barcelona"
-            checkIn={new Date("2024-07-13T16:00:00")}
-            checkOut={new Date("2024-07-16T11:00:00")}
-            location="Barcelona, Spain"
-            confirmationLink="https://www.hotelartsbarcelona.com/"
-            militaryTime={true}
-          />
+            <FlightEvent
+              origin="MIA"
+              destination="BCN"
+              airline="American Airlines"
+              departureTime={new Date("2024-07-12T22:00:00")}
+              arrivalTime={new Date("2024-07-13T13:35:00")}
+              confirmationLink="https://www.aa.com/"
+              militaryTime = {true}
+            />
+            <Gap precedingArrivalTime={new Date("2024-07-13T13:35:00")} followingDepartureTime={new Date("2024-07-13T16:00:00")} />
+            <AccomodationEvent
+              name="Hotel Arts Barcelona"
+              checkIn={new Date("2024-07-13T16:00:00")}
+              checkOut={new Date("2024-07-16T11:00:00")}
+              location="Bogota, Colombia"
+              confirmationLink="https://www.hotelartsbarcelona.com/"
+              militaryTime={true}
+            />
           </div>
-          <FlightForm />
+          {/* <FlightForm militaryTime={true} /> */}
+          <AccomodationForm militaryTime={true} />
         </div>
       </main>
     </div>

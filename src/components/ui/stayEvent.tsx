@@ -1,10 +1,10 @@
-import type { AccomodationEventProps } from "~/types"
+import type { StayEventProps } from "~/types"
 import { fetchLocationPhoto, formatTime } from "~/helpers"
 import { House } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { useEffect, useState } from "react"
 
-export default function AccomodationEvent({ checkIn, checkOut, name, location, militaryTime, confirmationLink }: AccomodationEventProps) {
+export default function StayEvent({ checkIn, checkOut, name, location, militaryTime, confirmationLink }: StayEventProps) {
   const checkInMonth = checkIn.toLocaleString("en-US", { month: "short" })
   const checkInDay = checkIn.getDate()
   const checkOutMonth = checkOut.toLocaleString("en-US", { month: "short" })
@@ -35,15 +35,15 @@ export default function AccomodationEvent({ checkIn, checkOut, name, location, m
         {/* Top row */}
         <div className="plasmo-absolute plasmo-top-2 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-flex plasmo-justify-between plasmo-items-start">
           <div className="plasmo-flex plasmo-flex-col">
-            <span className="plasmo-text-p plasmo-italic">&lt;- {checkInMonth} {checkInDay} · {formatTime(checkIn, militaryTime)}</span>
-            <span className="plasmo-text-h4 plasmo-font-semibold">{name}</span>
+            <span className="plasmo-text-p plasmo-italic plasmo-text-shadow-md">&lt;- {checkInMonth} {checkInDay} · {formatTime(checkIn, militaryTime)}</span>
+            <span className="plasmo-text-h4 plasmo-font-semibold plasmo-text-shadow-md">{name}</span>
           </div>
           <House className="plasmo-size-8 plasmo-stroke-1 plasmo-shrink-0" />
         </div>
 
         {/* Bottom row */}
         <div className="plasmo-absolute plasmo-bottom-0 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-pb-2 plasmo-flex plasmo-justify-between plasmo-items-end">
-          <span className="plasmo-text-p plasmo-font-normal plasmo-italic">-&gt; {checkOutMonth} {checkOutDay} · {formatTime(checkOut, militaryTime)}</span>
+          <span className="plasmo-text-p plasmo-font-normal plasmo-italic plasmo-text-shadow-md">-&gt; {checkOutMonth} {checkOutDay} · {formatTime(checkOut, militaryTime)}</span>
           <Button size="xs" onClick={() => window.open(confirmationLink, "_blank")}>
             Confirmation
           </Button>

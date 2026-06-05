@@ -114,7 +114,7 @@
   { "icao": "AXB", "name": "Air India Express", "domain": "airindiaexpress.in" },
   { "icao": "MI", "name": "SilkAir", "domain": "silkair.com" },
   { "icao": "LVL", "name": "Level", "domain": "flylevel.com" },
-  { "icao": "NAX", "name": "Norse Atlantic Airways", "domain": "norseatlantic.com" },
+  { "icao": "NBT", "name": "Norse Atlantic Airways", "domain": "norseatlantic.com" },
   { "icao": "CDG", "name": "Shandong Airlines", "domain": "shandongair.com" },
   { "icao": "BJS", "name": "Juneyao Airlines", "domain": "juneyaoair.com" },
   { "icao": "SHA", "name": "Shanghai Airlines", "domain": "shanghai-airlines.com" },

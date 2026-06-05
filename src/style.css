@@ -5,6 +5,24 @@
 @tailwind utilities;
 
 @layer base {
+  /* Hide HTML5 Number input spin buttons */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+@layer base {
+
+  /* WebKit (Chrome, Safari, Opera) */
+  *::-webkit-scrollbar { display: thin; }
+
   :root {
     /* Backgrounds */
     --background:        #ffffff;
