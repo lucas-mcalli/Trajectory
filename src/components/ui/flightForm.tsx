@@ -6,12 +6,12 @@ import { DateTimePicker } from "~components/ui/dateTimePicker"
 import AirportCombobox from "~components/ui/airportCombobox"
 import AirlineCombobox from "~components/ui/airlineCombobox"
 import { Storage } from "@plasmohq/storage"
+import type { TripEvent } from "~types"
 
 const singleFlightSchema = z.object({
   origin: z.string().min(1, "Required"),
   destination: z.string().min(1, "Required"),
   airline: z.string().min(1, "Required"),
-
   departureTime: z.date({error: "Required"}),
   arrivalTime: z.date({ error: "Required" })
 })
@@ -28,12 +28,12 @@ const singleFlightSchema = z.object({
 
 export const flightFormSchema = z.object({
   flights: z.array(singleFlightSchema).min(1),
-  confirmationLink: z.url("Must be a valid URL")
+  confirmationLink: z.url("Must be a valid URL").optional()
 })
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
-export default function FlightForm ({militaryTime}: {militaryTime: boolean}) {
+export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boolean, addEvent: (event: TripEvent) => void}) {
 
   const form = useForm<FlightFormValues>({
     resolver: zodResolver(flightFormSchema),
@@ -56,10 +56,17 @@ export default function FlightForm ({militaryTime}: {militaryTime: boolean}) {
     name: "flights"
   })
 
-  const onSubmit = async (values: FlightFormValues) => {
-    // const storage = new Storage()
-    // await storage.set("flights", values.flights)
-    // TODO: Figure out Plasmo storage after building all components. Here, we have a 'flights' array, which wouldn't work because we need something to hold flights, accomodations, and daytrips to build the timeline component.
+  const onSubmit = (values: FlightFormValues) => {
+    values.flights.forEach(flight => {
+      addEvent({
+        type: "flight",
+        origin: flight.origin,
+        destination: flight.destination,
+        airline: flight.airline,
+        departureTime: flight.departureTime,
+        arrivalTime: flight.arrivalTime
+      })
+    })
   }
 
 
@@ -161,10 +168,10 @@ export default function FlightForm ({militaryTime}: {militaryTime: boolean}) {
             <AirlineCombobox
               label="Airline"
               value={form.watch(`flights.${index}.airline`)}
-              onChange={(icao) => {
+              onChange={(name) => {
                 form.setValue(
                   `flights.${index}.airline`,
-                  icao
+                  name
                 )
               }}
             />
@@ -182,7 +189,7 @@ export default function FlightForm ({militaryTime}: {militaryTime: boolean}) {
               arrivalTime: undefined as unknown as Date
             })
           }
-          className="plasmo-text-muted-foreground plasmo-text-p plasmo-font-semibold plasmo-self-start"
+          className="plasmo-text-muted-foreground plasmo-text-sm plasmo-font-semibold plasmo-self-start hover:plasmo-text-foreground plasmo-transition-colors"
         >
           + Add return/connecting flight
         </button>

@@ -27,7 +27,7 @@ export default function FlightEvent({ origin, destination, airline, departureTim
         <div className="plasmo-absolute plasmo-bottom-0 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-pb-2 plasmo-flex plasmo-justify-between plasmo-items-end">
           <div className="plasmo-flex plasmo-flex-col">
             <span className="plasmo-text-foreground plasmo-text-p plasmo-font-normal">{airline}</span>
-            <span className="plasmo-text-foreground plasmo-text-p plasmo-font-normal">
+            <span className="plasmo-text-foreground plasmo-text-p">
               {formatTime(departureTime, militaryTime)} - {formatTime(arrivalTime, militaryTime)}
               {isNextDay(departureTime, arrivalTime) && (
                 <sup className="plasmo-text-p-sm">+1</sup>

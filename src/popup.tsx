@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import cssText from "data-text:~style.css"
 import { Navbar } from "~components/ui/navbar"
 // @ts-ignore
 import "style.css"
@@ -8,74 +7,36 @@ import FlightEvent from "~/components/ui/flightEvent"
 import Gap from "~components/ui/gap"
 import AccomodationEvent from "~components/ui/stayEvent"
 import FlightForm from "~/components/ui/flightForm"
-import AccomodationForm from "~components/ui/stayForm"
+import StayForm from "~components/ui/stayForm"
+import DaytripForm from "~components/ui/daytripForm"
+import DaytripEvent from "~components/ui/daytripEvent"
+import { useStorage } from "@plasmohq/storage/hook"
+import type { TripEvent } from "~types"
+import Timeline from "~components/ui/timeline"
 
-type Event = {
-  id: string
-  type: "flight" | "airbnb"
-  title: string
-  confirmationLink: string
-  flightNumber?: string
-  originAirport?: string
-  destinationAirport?: string
-  departureTime?: string
-  arrivalTime?: string
-  checkinDate?: string
-  checkoutDate?: string
-  checkinTime?: string
-  checkoutTime?: string
-  numberofGuests?: string
-  details?: string
-}
 
-const sampleTrip = (): Event[] => [
-  { id: "e1", type: "flight", title: "Flight: SFO → LAX", details: "AA 123 • 9:00 AM", confirmationLink: "https://wwww.aa.com/" },
-  { id: "e2", type: "airbnb", title: "Stay: Cozy Cottage", details: "3 nights • Oceanview", confirmationLink: "https://wwww.airbnb.com/"},
-  { id: "e3", type: "flight", title: "Flight: LAX → SFO", details: "AA 987 • 6:30 PM", confirmationLink: "https://wwww.aa.com/" }
-]
-
-function TimelineItem({ item }: { item: Event }) {
-  return (
-    <li className="plasmo-p-3 plasmo-rounded plasmo-shadow-sm plasmo-bg-white plasmo-border plasmo-border-gray-200">
-      <div className="plasmo-flex plasmo-justify-between plasmo-items-center">
-        <div>
-          <div className="plasmo-font-semibold">{item.type === "flight" ? "✈️ " : "🏠 "}{item.title}</div>
-          <div className="plasmo-text-sm plasmo-text-gray-500">{item.details}</div>
-        </div>
-      </div>
-    </li>
-  )
-}
 
 export default function IndexPopup() {
-  const [timeline, setTimeline] = useState<Event[] | null>(null)
+  const [events, setEvents] = useStorage<TripEvent[]>("events", []) // events will now persist in chrome.storage.sync because of useStorage !
+  const [militaryTime, setMilitaryTime] = useState(false)
 
-
-  void cssText
-
-  const onCreate = () => setTimeline(sampleTrip())
-
-  const addEvent = (type: Event["type"]) => {
-    setTimeline((prev) => {
-      const next = prev ? [...prev] : []
-      next.push({
-        id: String(Date.now()),
-        type,
-        title: type === "flight" ? "New Flight" : "New Stay",
-        details: "details",
-        confirmationLink: ""
-      })
-      return next
-    })
+  const addEvent = (event: TripEvent) => {
+    setEvents(prevEvents => [...(prevEvents ?? []), event]) // add new event to existing events, or start a new array if prevEvents is undefined
   }
+
 
   return (
     <div style={{scrollbarWidth: "none" }} className="plasmo-h-[600px] plasmo-w-[775px] plasmo-rounded-md plasmo-flex plasmo-flex-col plasmo-overflow-hidden plasmo-bg-white plasmo-text-slate-900">
-      <Navbar />
-
+      <Navbar setMilitaryTime={setMilitaryTime} />
       <main style={{scrollbarWidth: "none" }} className="plasmo-p-4 plasmo-pr-5 plasmo-flex-1 plasmo-overflow-y-auto">
         <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-4">
-          <div className="plasmo-flex plasmo-flex-col plasmo-gap-2">
+          <Timeline events={events} militaryTime={militaryTime} />
+          <div className="plasmo-flex plasmo-flex-col plasmo-gap-10">
+            <FlightForm militaryTime={militaryTime} addEvent={addEvent} />
+            <StayForm militaryTime={militaryTime} addEvent={addEvent} />
+            <DaytripForm militaryTime={militaryTime} addEvent={addEvent} />
+          </div>
+          {/* <div className="plasmo-flex plasmo-flex-col plasmo-gap-2">
             <FlightEvent
               origin="MIA"
               destination="BCN"
@@ -89,14 +50,15 @@ export default function IndexPopup() {
             <AccomodationEvent
               name="Hotel Arts Barcelona"
               checkIn={new Date("2024-07-13T16:00:00")}
-              checkOut={new Date("2024-07-16T11:00:00")}
-              location="Bogota, Colombia"
+              checkOut={new Date("2024-07-13T17:00:00")}
+              location="Spain"
+              flagLink="https://flagsapi.com/ES/flat/64.png"
               confirmationLink="https://www.hotelartsbarcelona.com/"
               militaryTime={true}
             />
           </div>
-          {/* <FlightForm militaryTime={true} /> */}
-          <AccomodationForm militaryTime={true} />
+          <FlightForm militaryTime={true} />
+          <DaytripForm militaryTime={true} /> */}
         </div>
       </main>
     </div>

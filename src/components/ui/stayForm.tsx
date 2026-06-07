@@ -6,6 +6,8 @@ import { User } from "lucide-react"
 import { DateTimePicker } from "~components/ui/dateTimePicker"
 import { Field, FieldLabel } from "./field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group"
+import CitiesCombobox from "./citiesCombobox"
+import type { TripEvent } from "~types"
 
 const StayFormSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -13,7 +15,8 @@ const StayFormSchema = z.object({
   location: z.string().min(1, "Required"),
   checkInTime: z.date({ error: "Required" }),
   checkOutTime: z.date({ error: "Required" }),
-  confirmationLink: z.url("Must be a valid URL")
+  flagLink: z.url("Must be a valid URL"),
+  confirmationLink: z.url("Must be a valid URL").optional()
 }).superRefine((data, ctx) => {
   if (data.checkOutTime <= data.checkInTime) {
     ctx.addIssue({
@@ -26,7 +29,7 @@ const StayFormSchema = z.object({
 
 type StayFormValues = z.infer<typeof StayFormSchema>
 
-export default function StayForm ({militaryTime}: {militaryTime: boolean}) {
+export default function StayForm ({militaryTime, addEvent}: {militaryTime: boolean, addEvent: (event: TripEvent) => void}) {
 
   const form = useForm<StayFormValues>({
     resolver: zodResolver(StayFormSchema),
@@ -40,8 +43,19 @@ export default function StayForm ({militaryTime}: {militaryTime: boolean}) {
   })
 
 
-  const onSubmit = async (values: StayFormValues) => {
-    // TODO: Figure out Plasmo storage after building all components. Here, we have a 'stay' object, which wouldn't work because we need something to hold flights, stays, and daytrips to build the timeline component.
+  const onSubmit = (values: StayFormValues) => {
+    console.log("submitting", values)
+    console.log("errors", form.formState.errors)
+    addEvent({
+      type: "stay",
+      name: values.name,
+      guests: values.guests,
+      location: values.location,
+      checkIn: values.checkInTime,
+      checkOut: values.checkOutTime,
+      flagLink: values.flagLink,
+      confirmationLink: values.confirmationLink
+    })
   }
 
 
@@ -71,22 +85,7 @@ export default function StayForm ({militaryTime}: {militaryTime: boolean}) {
           value={form.watch(`checkInTime`)}
           onChange={(date) => {
             if (date) {
-              // 1. Set the check-in time normally
               form.setValue(`checkInTime`, date)
-
-              // 2. Grab the current value of check-out time for this specific stay index
-              const currentCheckOut = form.getValues(`checkOutTime`)
-
-              // 3. Create a target date object for the updated check-out
-              const newCheckOut = currentCheckOut ? new Date(currentCheckOut) : new Date(date)  
-
-              // 4. Force the check-out date to match the new check-in date
-              newCheckOut.setFullYear(date.getFullYear())
-              newCheckOut.setMonth(date.getMonth())
-              newCheckOut.setDate(date.getDate())
-
-              // 5. Update the check-out time in React Hook Form's state
-              form.setValue(`checkOutTime`, newCheckOut)
             }
           }}
           militaryTime={militaryTime}
@@ -107,10 +106,24 @@ export default function StayForm ({militaryTime}: {militaryTime: boolean}) {
           militaryTime={militaryTime}
         />
 
+        < CitiesCombobox
+          label="Location"
+          value={form.watch(`location`)}
+          onChange={(location) => {
+            if (!location) {
+              form.setValue("location", "")
+              form.setValue("flagLink", "")
+              return
+            }
+            form.setValue("location", `${location.city}, ${location.country}`)
+            form.setValue("flagLink", location.flag)
+          }}
+        />
+
          <Field>
             <FieldLabel>Confirmation Link</FieldLabel>
             <InputGroup>
-              <InputGroupInput {...form.register("confirmationLink")} />
+              <InputGroupInput type="url"  {...form.register("confirmationLink")} />
             </InputGroup>
           </Field>
 
@@ -121,6 +134,7 @@ export default function StayForm ({militaryTime}: {militaryTime: boolean}) {
           Save stay
         </button>
       </form>
+      <pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
     </div>
   )
 }

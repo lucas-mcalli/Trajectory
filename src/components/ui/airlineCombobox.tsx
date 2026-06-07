@@ -58,7 +58,7 @@ export default function AirlineCombobox({
   }, [])
 
   function handleSelect(airline: AirlineEntry) {
-    onChange(airline.icao)
+    onChange(airline.name)
     setOpen(false)
     setQuery("")
   }
