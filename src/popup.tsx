@@ -17,11 +17,37 @@ import Timeline from "~components/ui/timeline"
 
 
 export default function IndexPopup() {
-  const [events, setEvents] = useStorage<TripEvent[]>("events", []) // events will now persist in chrome.storage.sync because of useStorage !
+  const [rawEvents, setEvents] = useStorage<any[]>("events", []) // events will now persist in chrome.storage.sync because of useStorage !
+  const events : TripEvent[] = (rawEvents ?? []).map(deserializeEvent) // this is what turns the strings into Dates on reopen
   const [militaryTime, setMilitaryTime] = useState(false)
 
-  const addEvent = (event: TripEvent) => {
-    setEvents(prevEvents => [...(prevEvents ?? []), event]) // add new event to existing events, or start a new array if prevEvents is undefined
+  const addEvents = (events: TripEvent[]) => { // this must be plural to handle adding multiple flights at once. works fine for singular additions.
+    setEvents(prevEvents => [...(prevEvents ?? []), ...events]) // add new event to existing events, or start a new array if prevEvents is undefined
+  }
+
+  function deserializeEvent(event: any): TripEvent { // This is necessary because dates are stored as strings in our events object. When the window is reopened, these strings must be constructed back into Date objects to use functions like getTime().
+    switch (event.type) {
+      case "flight":
+        return {
+          ...event,
+          departureTime: new Date(event.departureTime),
+          arrivalTime: new Date(event.arrivalTime)
+        }
+      case "stay":
+        return {
+          ...event,
+          checkIn: new Date(event.checkIn),
+          checkOut: new Date(event.checkOut)
+        }
+      case "daytrip":
+        return {
+          ...event,
+          departureTime: new Date(event.departureTime),
+          returnTime: new Date(event.returnTime)
+        }
+      default:
+        return event as TripEvent
+    }
   }
 
 
@@ -32,9 +58,9 @@ export default function IndexPopup() {
         <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-4">
           <Timeline events={events} militaryTime={militaryTime} />
           <div className="plasmo-flex plasmo-flex-col plasmo-gap-10">
-            <FlightForm militaryTime={militaryTime} addEvent={addEvent} />
-            <StayForm militaryTime={militaryTime} addEvent={addEvent} />
-            <DaytripForm militaryTime={militaryTime} addEvent={addEvent} />
+            <FlightForm militaryTime={militaryTime} addEvents={addEvents} />
+            <StayForm militaryTime={militaryTime} addEvents={addEvents} />
+            <DaytripForm militaryTime={militaryTime} addEvents={addEvents} />
           </div>
           {/* <div className="plasmo-flex plasmo-flex-col plasmo-gap-2">
             <FlightEvent

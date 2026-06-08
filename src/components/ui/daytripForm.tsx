@@ -20,7 +20,7 @@ const DaytripFormSchema = z.object({
 
 type DaytripFormValues = z.input<typeof DaytripFormSchema>
 
-export default function DaytripForm({ militaryTime, addEvent }: { militaryTime: boolean, addEvent: (event: TripEvent) => void }) {
+export default function DaytripForm({ militaryTime, addEvents }: { militaryTime: boolean, addEvents: (event: TripEvent[]) => void }) {
   const [showConfirmationField, setShowConfirmationField] = React.useState(false)
 
   const form = useForm<DaytripFormValues>({
@@ -36,7 +36,7 @@ export default function DaytripForm({ militaryTime, addEvent }: { militaryTime: 
   const isReturnsNextDay = form.watch("returnsNextDay")
 
   const onSubmit = (values: DaytripFormValues) => {
-    addEvent({
+    addEvents([{
       type: "daytrip",
       name: values.name,
       departureTime: values.departureTime,
@@ -44,7 +44,7 @@ export default function DaytripForm({ militaryTime, addEvent }: { militaryTime: 
       returnsNextDay: values.returnsNextDay,
       confirmationLink: values.confirmationLink,
       isActiveDuringStay: false, // This can be enhanced later to check against stay dates
-    })
+    }])
   }
 
   return (
@@ -53,12 +53,17 @@ export default function DaytripForm({ militaryTime, addEvent }: { militaryTime: 
       
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         {/* Name input */}
-        <Field>
-          <FieldLabel>Name</FieldLabel>
-          <InputGroup>
-            <InputGroupInput {...form.register("name")} />
-          </InputGroup>
-        </Field>
+          <Field className="plasmo-flex-[3]">
+            <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+              <FieldLabel>Name</FieldLabel>
+              {form.formState.errors.name && (
+                <p className="plasmo-text-xs plasmo-text-destructive">{form.formState.errors.name.message}</p>
+              )}
+            </div>
+            <InputGroup>
+              <InputGroupInput {...form.register("name")} aria-invalid={!!form.formState.errors.name} />
+            </InputGroup>
+          </Field>
 
         {/* Departure block */}
         <div className="plasmo-flex plasmo-flex-col plasmo-gap-1.5">
@@ -97,6 +102,8 @@ export default function DaytripForm({ militaryTime, addEvent }: { militaryTime: 
               }
             }}
             militaryTime={militaryTime}
+            error={form.formState.errors.departureTime?.message}
+            onOpen={() => form.clearErrors(`departureTime`)}
           />
         </div>
 
@@ -108,6 +115,8 @@ export default function DaytripForm({ militaryTime, addEvent }: { militaryTime: 
             onChange={(date) => date && form.setValue("returnTime", date)}
             militaryTime={militaryTime}
             showNextDayIndicator={isReturnsNextDay}
+            error={form.formState.errors.returnTime?.message}
+            onOpen={() => form.clearErrors(`returnTime`)}
           />
         </div>
 

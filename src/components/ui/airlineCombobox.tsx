@@ -37,6 +37,8 @@ export default function AirlineCombobox({
   value,
   onChange,
   placeholder = "Search airline...",
+  error,
+  onOpen
 }: AirlineComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
@@ -44,7 +46,7 @@ export default function AirlineCombobox({
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   const results = React.useMemo(() => search(query), [query])
-  const selected = React.useMemo(() => ALL_AIRLINES.find((a) => a.icao === value), [value])
+  const selected = React.useMemo(() => ALL_AIRLINES.find((a) => a.name === value), [value])
 
   React.useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -72,17 +74,23 @@ export default function AirlineCombobox({
 
   return (
     <Field className="plasmo-w-full plasmo-flex plasmo-flex-col">
-      <FieldLabel>{label}</FieldLabel>
+      <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+        <FieldLabel>{label}</FieldLabel>
+        {error && (
+          <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
+        )}
+      </div>
 
       <div ref={containerRef} className="plasmo-relative">
         <div
-          onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus(), 0) }}
+          onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus(), 0); onOpen?.() }}
           className={cn(
             "plasmo-flex plasmo-h-9 plasmo-w-full plasmo-items-center plasmo-justify-between",
             "plasmo-rounded-md plasmo-border plasmo-border-input plasmo-bg-background",
             "plasmo-px-3 plasmo-py-2 plasmo-text-sm plasmo-cursor-pointer",
             "plasmo-transition-all plasmo-duration-100 plasmo-ease-out",
-            open && "plasmo-border-ring plasmo-ring-2 plasmo-ring-ring"
+            open && "plasmo-border-ring plasmo-ring-2 plasmo-ring-ring",
+            error && "plasmo-ring-2 plasmo-ring-destructive"
           )}
         >
           <div className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-flex-1 plasmo-min-w-0">
@@ -145,7 +153,7 @@ export default function AirlineCombobox({
                       "plasmo-px-3 plasmo-py-2 plasmo-cursor-pointer plasmo-text-sm",
                       "hover:plasmo-bg-accent hover:plasmo-text-accent-foreground",
                       "plasmo-transition-colors",
-                      value === airline.icao && "plasmo-bg-accent"
+                      value === airline.name && "plasmo-bg-accent"
                     )}
                   >
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-min-w-0">
@@ -162,7 +170,7 @@ export default function AirlineCombobox({
                       <span className="plasmo-text-xs plasmo-font-mono plasmo-font-semibold plasmo-text-primary">
                         {airline.icao}
                       </span>
-                      {value === airline.icao && (
+                      {value === airline.name && (
                         <Check className="plasmo-size-3 plasmo-text-primary" />
                       )}
                     </div>

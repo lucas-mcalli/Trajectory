@@ -33,7 +33,7 @@ export const flightFormSchema = z.object({
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
-export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boolean, addEvent: (event: TripEvent) => void}) {
+export default function FlightForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TripEvent[]) => void}) {
 
   const form = useForm<FlightFormValues>({
     resolver: zodResolver(flightFormSchema),
@@ -56,18 +56,16 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
     name: "flights"
   })
 
-  const onSubmit = (values: FlightFormValues) => {
-    values.flights.forEach(flight => {
-      addEvent({
-        type: "flight",
-        origin: flight.origin,
-        destination: flight.destination,
-        airline: flight.airline,
-        departureTime: flight.departureTime,
-        arrivalTime: flight.arrivalTime
-      })
-    })
-  }
+const onSubmit = (values: FlightFormValues) => {
+  addEvents(values.flights.map(flight => ({
+    type: "flight" as const,
+    origin: flight.origin,
+    destination: flight.destination,
+    airline: flight.airline,
+    departureTime: flight.departureTime,
+    arrivalTime: flight.arrivalTime
+  })))
+}
 
 
   return (
@@ -75,7 +73,7 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
       <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new flight</h1>
       <form
         className="plasmo-flex plasmo-flex-col plasmo-gap-4"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, (errors) => console.log("validation errors", errors))}
       >
         {fields.map((field, index) => (
           <div
@@ -120,7 +118,8 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
                 }
               }}
               militaryTime={militaryTime}
-
+              error={form.formState.errors.flights?.[index]?.departureTime?.message}
+              onOpen={() => form.clearErrors(`flights.${index}.departureTime`)}
             />
 
             <DateTimePicker
@@ -135,6 +134,8 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
                 }
               }}
               militaryTime={militaryTime}
+              error={form.formState.errors.flights?.[index]?.arrivalTime?.message}
+              onOpen={() => form.clearErrors(`flights.${index}.arrivalTime`)}
             />
 
             <div className="plasmo-flex plasmo-gap-4">
@@ -148,6 +149,8 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
                     iata
                   )
                 }}
+                error={form.formState.errors.flights?.[index]?.origin?.message}
+                onOpen={() => form.clearErrors(`flights.${index}.origin`)}
                 />
               </div>
             
@@ -161,6 +164,8 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
                     iata
                   )
                 }}
+                error={form.formState.errors.flights?.[index]?.destination?.message}
+                onOpen={() => form.clearErrors(`flights.${index}.destination`)}
                 />
               </div>
             </div>
@@ -174,6 +179,8 @@ export default function FlightForm ({militaryTime, addEvent}: {militaryTime: boo
                   name
                 )
               }}
+              error={form.formState.errors.flights?.[index]?.airline?.message}
+              onOpen={() => form.clearErrors(`flights.${index}.airline`)}
             />
           </div>
         ))}

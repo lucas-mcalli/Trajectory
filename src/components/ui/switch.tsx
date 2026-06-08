@@ -8,6 +8,7 @@ const Switch = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
 >(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
+    type="button"
     className={cn(
       "plasmo-peer plasmo-inline-flex plasmo-h-6 plasmo-w-11 plasmo-shrink-0 plasmo-cursor-pointer plasmo-items-center plasmo-rounded-full plasmo-border-2 plasmo-border-transparent plasmo-transition-colors focus-visible:plasmo-outline-none focus-visible:plasmo-ring-2 focus-visible:plasmo-ring-ring focus-visible:plasmo-ring-offset-2 focus-visible:plasmo-ring-offset-background disabled:plasmo-cursor-not-allowed disabled:plasmo-opacity-50 data-[state=checked]:plasmo-bg-primary data-[state=unchecked]:plasmo-bg-input",
       className

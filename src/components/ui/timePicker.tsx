@@ -4,14 +4,8 @@ import { Clock } from "lucide-react"
 import { cn } from "~/lib/utils"
 import { Field, FieldLabel } from "~/components/ui/field"
 import { InputGroup, InputGroupAddon } from "~/components/ui/input-group"
+import type { TimePickerProps } from "~types"
 
-interface TimePickerProps {
-  label?: string
-  value: Date | undefined
-  onChange: (date: Date) => void
-  militaryTime?: boolean
-  showNextDayIndicator?: boolean
-}
 
 function formatDisplayTime(date: Date | undefined, militaryTime?: boolean): string {
   if (!date || isNaN(date.getTime())) return "Select time"
@@ -30,6 +24,8 @@ export function TimePicker({
   onChange,
   militaryTime = false,
   showNextDayIndicator = false,
+  error,
+  onOpen
 }: TimePickerProps) {
   const [showDropdown, setShowDropdown] = React.useState(false)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
@@ -87,21 +83,27 @@ export function TimePicker({
 
   return (
     <div className="plasmo-flex plasmo-w-full">
-      <Field className="plasmo-flex plasmo-w-full plasmo-flex-col">
-        {label && <FieldLabel>{label}</FieldLabel>}
+      {/* <Field className="plasmo-flex plasmo-w-full plasmo-flex-col">
+        <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+          <FieldLabel>{label}</FieldLabel>
+          {error && (
+            <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
+          )}
+        </div> */}
         <div className="plasmo-relative" ref={dropdownRef}>
-          <InputGroup className={showDropdown ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
+          <InputGroup className={error ? "plasmo-ring-2 plasmo-ring-destructive" : showDropdown ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
             <button
               onClick={(e) => {
                 e.preventDefault()
                 setShowDropdown(!showDropdown)
+                onOpen?.()
               }}
               className={cn(
                 "plasmo-flex-1 plasmo-text-left plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-px-2 plasmo-py-2 plasmo-text-sm plasmo-shadow-none plasmo-flex plasmo-items-center plasmo-gap-0.5",
                 value ? "plasmo-text-foreground" : "plasmo-text-muted-foreground",
                 "focus-visible:plasmo-outline-none focus-visible:plasmo-ring-0",
                 "disabled:plasmo-cursor-not-allowed disabled:plasmo-opacity-50",
-                "hover:plasmo-bg-accent/50 plasmo-transition-colors"
+                "hover:plasmo-bg-accent/50 plasmo-transition-colors" 
               )}
             >
               <span>{formatDisplayTime(value, militaryTime)}</span>

@@ -44,6 +44,8 @@ export default function AirportCombobox({
   value,
   onChange,
   placeholder = "Search airport...",
+  error,
+  onOpen
 }: AirportComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
@@ -84,18 +86,23 @@ export default function AirportCombobox({
 
   return (
     <Field className="plasmo-w-full plasmo-flex plasmo-flex-col">
-      <FieldLabel>{label}</FieldLabel>
-
+      <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+        <FieldLabel>{label}</FieldLabel>
+        {error && (
+          <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
+        )}
+      </div>
       <div ref={containerRef} className="plasmo-relative plasmo-flex-1 plasmo-min-w-0">
         {/* Trigger */}
         <div
-          onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0) }}
+          onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0); onOpen?.() }}
           className={cn(
             "plasmo-flex plasmo-h-9 plasmo-w-full plasmo-min-w-0 plasmo-items-center plasmo-justify-between",
             "plasmo-rounded-md plasmo-border plasmo-border-input plasmo-bg-background",
             "plasmo-px-3 plasmo-py-2 plasmo-text-sm plasmo-cursor-pointer",
             "plasmo-transition-all plasmo-ease-out plasmo-duration-100",
             open && "plasmo-border-ring plasmo-ring-2 plasmo-ring-ring",
+            error && "plasmo-ring-2 plasmo-ring-destructive"
           )}
         >
           {open ? (

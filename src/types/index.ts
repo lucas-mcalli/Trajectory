@@ -41,6 +41,9 @@ export type DateTimeInputProps = {
   value?: Date
   onChange: (date: Date | undefined) => void
   militaryTime?: boolean
+  defaultMonth?: Date
+  error? : string
+  onOpen?: () => void
 }
 
 export type AirportComboboxProps = {
@@ -48,6 +51,8 @@ export type AirportComboboxProps = {
   value?: string   // IATA code e.g. "MIA"
   onChange: (iata: string) => void
   placeholder?: string
+  error? : string
+  onOpen?: () => void
 }
 
 export type Airport = {
@@ -68,6 +73,8 @@ export type AirlineComboboxProps = {
   value?: string
   onChange: (iata: string) => void
   placeholder?: string
+  error? : string
+  onOpen?: () => void
 }
 
 export type CalendarState = {
@@ -87,6 +94,18 @@ export type CitiesComboboxProps = {
   value: string // Value state tracking the selection key (e.g., "City, Country" or geonameid string)
   onChange: (location: LocationEntry | null) => void
   placeholder?: string
+  error? : string
+  onOpen?: () => void
+}
+
+export type TimePickerProps = {
+  label?: string
+  value: Date | undefined
+  onChange: (date: Date) => void
+  militaryTime?: boolean
+  showNextDayIndicator?: boolean
+  error?: string
+  onOpen?: () => void
 }
 
 export type TripEvent = Flight | Stay | Daytrip

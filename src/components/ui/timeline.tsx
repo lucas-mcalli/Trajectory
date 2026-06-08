@@ -4,6 +4,7 @@ import Gap from "~components/ui/gap"
 import type { TripEvent } from "~types"
 import StayEvent from "~components/ui/stayEvent"
 import DaytripEvent from "./daytripEvent"
+import type { Daytrip } from "~types"
 
 export default function Timeline({ events, militaryTime }: { events: TripEvent[], militaryTime: boolean }) {
 
@@ -22,6 +23,17 @@ export default function Timeline({ events, militaryTime }: { events: TripEvent[]
     getEventStartTime(a).getTime() - getEventStartTime(b).getTime()
   )
 
+  const isDaytripActiveDuringStay = (daytrip: Daytrip): boolean => { // this goes thru the events array and determines if daytrips happen during active stays
+  return sorted.some(event => {
+    if (event.type !== "stay") return false
+    const start = new Date(event.checkIn).getTime()
+    const end = new Date(event.checkOut).getTime()
+    const dep = new Date(daytrip.departureTime).getTime()
+    const ret = new Date(daytrip.returnTime).getTime()
+    return dep >= start && ret <= end
+  })
+}
+
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-2">
       {sorted.map((event, i) => {
@@ -30,8 +42,10 @@ export default function Timeline({ events, militaryTime }: { events: TripEvent[]
           <div key={i}>
             {event.type === "flight" && <FlightEvent {...event} militaryTime={militaryTime}/>}
             {event.type === "stay" && <StayEvent {...event} militaryTime={militaryTime}/>}
-            {event.type === "daytrip" && <DaytripEvent {...event} militaryTime={militaryTime}/>}
-            {next && <Gap precedingArrivalTime={getEventEndTime(event)} followingDepartureTime={getEventStartTime(next)}/>}
+            {event.type === "daytrip" && <DaytripEvent {...event} militaryTime={militaryTime} isActiveDuringStay={isDaytripActiveDuringStay(event)} />}
+            {next && getEventStartTime(next).getTime() - getEventEndTime(event).getTime() > 30 && (
+              <Gap precedingArrivalTime={getEventEndTime(event)} followingDepartureTime={getEventStartTime(next)} />
+            )}
           </div>
         )
       })}

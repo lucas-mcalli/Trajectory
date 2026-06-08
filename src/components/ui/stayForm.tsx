@@ -16,7 +16,10 @@ const StayFormSchema = z.object({
   checkInTime: z.date({ error: "Required" }),
   checkOutTime: z.date({ error: "Required" }),
   flagLink: z.url("Must be a valid URL"),
-  confirmationLink: z.url("Must be a valid URL").optional()
+  confirmationLink: z
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal("")) // for empty confirmation link state
 }).superRefine((data, ctx) => {
   if (data.checkOutTime <= data.checkInTime) {
     ctx.addIssue({
@@ -29,7 +32,7 @@ const StayFormSchema = z.object({
 
 type StayFormValues = z.infer<typeof StayFormSchema>
 
-export default function StayForm ({militaryTime, addEvent}: {militaryTime: boolean, addEvent: (event: TripEvent) => void}) {
+export default function StayForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TripEvent[]) => void}) {
 
   const form = useForm<StayFormValues>({
     resolver: zodResolver(StayFormSchema),
@@ -46,7 +49,7 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
   const onSubmit = (values: StayFormValues) => {
     console.log("submitting", values)
     console.log("errors", form.formState.errors)
-    addEvent({
+    addEvents([{
       type: "stay",
       name: values.name,
       guests: values.guests,
@@ -55,7 +58,7 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
       checkOut: values.checkOutTime,
       flagLink: values.flagLink,
       confirmationLink: values.confirmationLink
-    })
+    }])
   }
 
 
@@ -65,9 +68,14 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="plasmo-flex plasmo-gap-4">
           <Field className="plasmo-flex-[3]">
-            <FieldLabel>Name</FieldLabel>
+            <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+              <FieldLabel>Name</FieldLabel>
+              {form.formState.errors.name && (
+                <p className="plasmo-text-xs plasmo-text-destructive">{form.formState.errors.name.message}</p>
+              )}
+            </div>
             <InputGroup>
-              <InputGroupInput {...form.register("name")} />
+              <InputGroupInput {...form.register("name")} aria-invalid={!!form.formState.errors.name} />
             </InputGroup>
           </Field>
           <Field className="plasmo-flex-1">
@@ -89,7 +97,8 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
             }
           }}
           militaryTime={militaryTime}
-
+          error={form.formState.errors.checkInTime?.message}
+          onOpen={() => form.clearErrors(`checkInTime`)}      
         />
 
         <DateTimePicker
@@ -104,11 +113,14 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
             }
           }}
           militaryTime={militaryTime}
+          defaultMonth={form.watch("checkInTime")}
+          error={form.formState.errors.checkOutTime?.message}
+          onOpen={() => form.clearErrors(`checkOutTime`)}         
         />
 
-        < CitiesCombobox
+        <CitiesCombobox
           label="Location"
-          value={form.watch(`location`)}
+          value={form.watch("location")}
           onChange={(location) => {
             if (!location) {
               form.setValue("location", "")
@@ -117,6 +129,11 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
             }
             form.setValue("location", `${location.city}, ${location.country}`)
             form.setValue("flagLink", location.flag)
+          }}
+          error={form.formState.errors.location?.message ?? form.formState.errors.flagLink?.message}
+          onOpen={() => {
+            form.clearErrors("location")
+            form.clearErrors("flagLink")
           }}
         />
 
@@ -134,7 +151,6 @@ export default function StayForm ({militaryTime, addEvent}: {militaryTime: boole
           Save stay
         </button>
       </form>
-      <pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
     </div>
   )
 }

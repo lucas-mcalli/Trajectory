@@ -1,6 +1,5 @@
 import type { StayEventProps } from "~/types"
 import { fetchLocationPhoto, formatTime } from "~/helpers"
-import { House } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { useEffect, useState } from "react"
 
@@ -27,15 +26,15 @@ export default function StayEvent({ checkIn, checkOut, name, location, militaryT
     <div className="plasmo-inline-flex plasmo-justify-start plasmo-items-start plasmo-gap-6">
       <div className="plasmo-flex plasmo-flex-col plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
         <span className="plasmo-text-black plasmo-text-p">{checkInMonth}</span>
-        <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none plasmo-w-6">{checkInDay}</span>
+        <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none plasmo-w-6 plasmo-text-center">{checkInDay}</span>
       </div>
 
       <div className="plasmo-w-72 plasmo-relative plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden" style={{ height: `${getTotalNights() <= 1 ? 130 : getTotalNights() * 70}px` }}>
   
-        {/* Background image */}
-        <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-cover plasmo-bg-center" style={{ backgroundImage: coverPhoto? `url(${coverPhoto})` : "none" }} />
-        {/* Dark overlay so text is readable */}
-        <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-white plasmo-opacity-70" />
+        {/* Background image or regular background if no image found */}
+        {coverPhoto ? <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-cover plasmo-bg-center" style={{ backgroundImage: `url(${coverPhoto})` }} /> : null}
+        {coverPhoto ? <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-white plasmo-opacity-70" /> : <div className="plasmo-bg-background-subtle plasmo-absolute plasmo-inset-0"/>}
+        
 
         {/* Top row */}
         <div className="plasmo-absolute plasmo-top-2 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-flex plasmo-justify-between plasmo-items-start">

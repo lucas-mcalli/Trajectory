@@ -44,7 +44,9 @@ export default function CitiesCombobox({
   label,
   value,
   onChange,
-  placeholder = "Search city"
+  placeholder = "Search city",
+  error,
+  onOpen
 }: CitiesComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
@@ -85,20 +87,27 @@ export default function CitiesCombobox({
 
   return (
     <Field className="plasmo-w-full plasmo-flex plasmo-flex-col">
-      <FieldLabel>{label}</FieldLabel>
+      <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+        <FieldLabel>{label}</FieldLabel>
+        {error && (
+          <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
+        )}
+      </div>
 
       <div ref={containerRef} className="plasmo-relative">
         <div
           onClick={() => {
             setOpen(true)
             setTimeout(() => inputRef.current?.focus(), 0)
+            onOpen?.()
           }}
           className={cn(
             "plasmo-flex plasmo-h-9 plasmo-w-full plasmo-items-center plasmo-justify-between",
             "plasmo-rounded-md plasmo-border plasmo-border-input plasmo-bg-background",
             "plasmo-px-3 plasmo-py-2 plasmo-text-sm plasmo-cursor-pointer",
             "plasmo-transition-all plasmo-duration-100 plasmo-ease-out",
-            open && "plasmo-border-ring plasmo-ring-2 plasmo-ring-ring"
+            open && "plasmo-border-ring plasmo-ring-2 plasmo-ring-ring",
+            error && "plasmo-ring-2 plasmo-ring-destructive"
           )}
         >
           <div className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-flex-1 plasmo-min-w-0">

@@ -22,11 +22,13 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
         "has-[>[data-align=block-end]]:plasmo-h-auto has-[>[data-align=block-end]]:plasmo-flex-col has-[>[data-align=block-end]]:[&>input]:plasmo-pt-3",
 
         // Focus state.
-        "has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-ring has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-2",
+        "has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-2 has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-ring",
 
         // Error state.
-        "has-[[data-slot][aria-invalid=true]]:plasmo-ring-destructive/20 has-[[data-slot][aria-invalid=true]]:plasmo-border-destructive dark:has-[[data-slot][aria-invalid=true]]:plasmo-ring-destructive/40",
+        "has-[[data-slot][aria-invalid=true]]:plasmo-ring-2 has-[[data-slot][aria-invalid=true]]:plasmo-ring-destructive",
 
+        // Error overrides focus ring color.
+        "has-[[data-slot][aria-invalid=true]]:has-[[data-slot=input-group-control]:focus-visible]:plasmo-ring-destructive",
         className
       )}
       {...props}
@@ -126,37 +128,39 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
   )
 }
 
-function InputGroupInput({
-  className,
-  ...props
-}: React.ComponentProps<"input">) {
-  return (
-    <Input
-      data-slot="input-group-control"
-      className={cn(
-        "plasmo-flex-1 plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-shadow-none focus-visible:plasmo-ring-0 dark:plasmo-bg-transparent",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+const InputGroupInput = React.forwardRef<HTMLInputElement, Omit<React.ComponentProps<"input">, "ref">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <Input
+        ref={ref}
+        data-slot="input-group-control"
+        className={cn(
+          "plasmo-flex-1 plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-shadow-none focus-visible:plasmo-ring-0 dark:plasmo-bg-transparent",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+InputGroupInput.displayName = "InputGroupInput"
 
-function InputGroupTextarea({
-  className,
-  ...props
-}: React.ComponentProps<"textarea">) {
-  return (
-    <Textarea
-      data-slot="input-group-control"
-      className={cn(
-        "plasmo-flex-1 plasmo-resize-none plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-py-3 plasmo-shadow-none focus-visible:plasmo-ring-0 dark:plasmo-bg-transparent",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, Omit<React.ComponentProps<"textarea">, "ref">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <Textarea
+        ref={ref}
+        data-slot="input-group-control"
+        className={cn(
+          "plasmo-flex-1 plasmo-resize-none plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-py-3 plasmo-shadow-none focus-visible:plasmo-ring-0 dark:plasmo-bg-transparent",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+InputGroupTextarea.displayName = "InputGroupTextarea"
 
 export {
   InputGroup,

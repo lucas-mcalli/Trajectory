@@ -38,15 +38,18 @@ function Calendar({
   selectedDate,
   onDateSelect,
   militaryTime,
+  defaultMonth,
 }: {
   selectedDate?: Date
   onDateSelect: (date: Date) => void
   militaryTime?: boolean
+  defaultMonth?: Date
 }) {
   const now = new Date()
+  const initial = defaultMonth ?? selectedDate ?? now
   const [state, setState] = React.useState<CalendarState>({
-    month: selectedDate?.getMonth() ?? now.getMonth(),
-    year: selectedDate?.getFullYear() ?? now.getFullYear(),
+    month: initial.getMonth(),
+    year: initial.getFullYear(),
   })
 
   // Calendar setup
@@ -134,6 +137,7 @@ function Calendar({
       <div className="plasmo-w-64">
         <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-4">
           <button
+            type="button"
             onClick={handlePrevMonth}
             className="plasmo-p-1 hover:plasmo-bg-accent plasmo-rounded plasmo-transition-colors"
             aria-label="Previous month"
@@ -144,6 +148,7 @@ function Calendar({
             {monthNames[state.month]} {state.year}
           </div>
           <button
+            type="button"
             onClick={handleNextMonth}
             className="plasmo-p-1 hover:plasmo-bg-accent plasmo-rounded plasmo-transition-colors"
             aria-label="Next month"
@@ -168,6 +173,7 @@ function Calendar({
               <div key={idx}>
                 {day ? (
                   <button
+                    type="button"
                     onClick={() => handleDayClick(day)}
                     className={cn(
                       "plasmo-w-8 plasmo-h-8 plasmo-rounded-md plasmo-text-sm plasmo-font-medium plasmo-transition-colors",
@@ -195,6 +201,7 @@ function Calendar({
             const isSelected = militaryTime ? currentHour === h : displayHour12 === h
             return (
               <button
+                type="button"
                 key={`h-${h}`}
                 onClick={() => handleTimeSelect('hour', h)}
                 className={cn(
@@ -214,6 +221,7 @@ function Calendar({
             const isSelected = currentMinute === m
             return (
               <button
+                type="button"
                 key={`m-${m}`}
                 onClick={() => handleTimeSelect('minute', m)}
                 className={cn(
@@ -258,6 +266,9 @@ export function DateTimePicker({
   value,
   onChange,
   militaryTime = false,
+  defaultMonth,
+  error,
+  onOpen
 }: DateTimeInputProps) {
   const [showCalendar, setShowCalendar] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
@@ -278,13 +289,19 @@ export function DateTimePicker({
   return (
     <div className="plasmo-flex plasmo-w-full">
       <Field className="plasmo-flex plasmo-w-full plasmo-flex-col">
-        <FieldLabel>{label}</FieldLabel>
+        <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
+          <FieldLabel>{label}</FieldLabel>
+          {error && (
+            <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
+          )}
+        </div>
         <div className="plasmo-relative" ref={calendarRef}>
-          <InputGroup className={showCalendar ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
+          <InputGroup className={error ? "plasmo-ring-2 plasmo-ring-destructive" : showCalendar ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
             <button
               onClick={(e) => {
                 e.preventDefault()
                 setShowCalendar(!showCalendar)
+                if (!showCalendar) onOpen?.() // allows the error to be cleared when the field is reopened
               }}
               className={cn(
                 "plasmo-flex-1 plasmo-text-left plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-px-2 plasmo-py-2 plasmo-text-sm plasmo-shadow-none",
@@ -307,6 +324,7 @@ export function DateTimePicker({
               selectedDate={value}
               onDateSelect={onChange}
               militaryTime={militaryTime}
+              defaultMonth={defaultMonth}
             />
           )}
         </div>
