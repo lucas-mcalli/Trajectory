@@ -1,17 +1,20 @@
 import * as z from "zod"
+import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { DateTimePicker } from "~components/ui/dateTimePicker"
 import AirportCombobox from "~components/ui/airportCombobox"
 import AirlineCombobox from "~components/ui/airlineCombobox"
-import { Storage } from "@plasmohq/storage"
 import type { TripEvent } from "~types"
+import { Field, FieldLabel } from "~/components/ui/field"
+import { InputGroup, InputGroupInput } from "~components/ui/input-group"
 
 const singleFlightSchema = z.object({
   origin: z.string().min(1, "Required"),
   destination: z.string().min(1, "Required"),
   airline: z.string().min(1, "Required"),
+  airlinePhoto: z.url(),
   departureTime: z.date({error: "Required"}),
   arrivalTime: z.date({ error: "Required" })
 })
@@ -28,12 +31,17 @@ const singleFlightSchema = z.object({
 
 export const flightFormSchema = z.object({
   flights: z.array(singleFlightSchema).min(1),
-  confirmationLink: z.url("Must be a valid URL").optional()
+  confirmationLink: z
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal("")) // for empty confirmation link state
 })
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
 export default function FlightForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TripEvent[]) => void}) {
+
+  const [showConfirmationField, setShowConfirmationField] = useState(false)
 
   const form = useForm<FlightFormValues>({
     resolver: zodResolver(flightFormSchema),
@@ -44,6 +52,7 @@ export default function FlightForm ({militaryTime, addEvents}: {militaryTime: bo
           origin: "",
           destination: "",
           airline: "",
+          airlinePhoto: "",
           departureTime: undefined,
           arrivalTime: undefined
         }
@@ -62,8 +71,10 @@ const onSubmit = (values: FlightFormValues) => {
     origin: flight.origin,
     destination: flight.destination,
     airline: flight.airline,
+    airlinePhoto: flight.airlinePhoto,
     departureTime: flight.departureTime,
-    arrivalTime: flight.arrivalTime
+    arrivalTime: flight.arrivalTime,
+    confirmationLink: values.confirmationLink || undefined
   })))
 }
 
@@ -173,11 +184,9 @@ const onSubmit = (values: FlightFormValues) => {
             <AirlineCombobox
               label="Airline"
               value={form.watch(`flights.${index}.airline`)}
-              onChange={(name) => {
-                form.setValue(
-                  `flights.${index}.airline`,
-                  name
-                )
+              onChange={(name, airlinePhoto) => {
+                form.setValue(`flights.${index}.airline`, name)
+                form.setValue(`flights.${index}.airlinePhoto`, airlinePhoto)
               }}
               error={form.formState.errors.flights?.[index]?.airline?.message}
               onOpen={() => form.clearErrors(`flights.${index}.airline`)}
@@ -192,6 +201,7 @@ const onSubmit = (values: FlightFormValues) => {
               origin: "",
               destination: "",
               airline: "",
+              airlinePhoto: "",
               departureTime: undefined as unknown as Date,
               arrivalTime: undefined as unknown as Date
             })
@@ -200,6 +210,31 @@ const onSubmit = (values: FlightFormValues) => {
         >
           + Add return/connecting flight
         </button>
+
+        {showConfirmationField ? (
+          <Field>
+            <FieldLabel>Confirmation Link</FieldLabel>
+            <InputGroup>
+              <InputGroupInput 
+                type="url"  
+                {...form.register("confirmationLink")} 
+              />
+            </InputGroup>
+            {form.formState.errors.confirmationLink && (
+              <p className="plasmo-text-xs plasmo-text-destructive plasmo-mt-1">
+                {form.formState.errors.confirmationLink.message}
+              </p>
+            )}
+          </Field>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowConfirmationField(true)}
+            className="plasmo-text-muted-foreground plasmo-text-sm plasmo-font-semibold plasmo-self-start hover:plasmo-text-foreground plasmo-transition-colors plasmo-mt-1"
+          >
+            + Add confirmation link
+          </button>
+        )}
 
         <button
           type="submit"

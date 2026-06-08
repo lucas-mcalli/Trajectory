@@ -1,4 +1,5 @@
 import * as z from "zod"
+import React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { User } from "lucide-react"
@@ -33,6 +34,7 @@ const StayFormSchema = z.object({
 type StayFormValues = z.infer<typeof StayFormSchema>
 
 export default function StayForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TripEvent[]) => void}) {
+    const [showConfirmationField, setShowConfirmationField] = React.useState(false)
 
   const form = useForm<StayFormValues>({
     resolver: zodResolver(StayFormSchema),
@@ -137,12 +139,31 @@ export default function StayForm ({militaryTime, addEvents}: {militaryTime: bool
           }}
         />
 
-         <Field>
+        {showConfirmationField ? (
+          <Field>
             <FieldLabel>Confirmation Link</FieldLabel>
             <InputGroup>
-              <InputGroupInput type="url"  {...form.register("confirmationLink")} />
+              <InputGroupInput 
+                type="url"  
+                {...form.register("confirmationLink")} 
+              />
             </InputGroup>
+            {form.formState.errors.confirmationLink && (
+              <p className="plasmo-text-xs plasmo-text-destructive plasmo-mt-1">
+                {form.formState.errors.confirmationLink.message}
+              </p>
+            )}
           </Field>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowConfirmationField(true)}
+            className="plasmo-text-muted-foreground plasmo-text-sm plasmo-font-semibold plasmo-self-start hover:plasmo-text-foreground plasmo-transition-colors plasmo-mt-1"
+          >
+            + Add confirmation link
+          </button>
+        )}
+
 
         <button
           type="submit"

@@ -3,7 +3,7 @@ import { isNextDay, formatTime } from "~/helpers"
 import { Plane } from "lucide-react"
 import { Button } from "~/components/ui/button"
 
-export default function FlightEvent({ origin, destination, airline, departureTime, arrivalTime, militaryTime, confirmationLink}: FlightEventProps) {
+export default function FlightEvent({ origin, destination, airline, airlinePhoto, departureTime, arrivalTime, militaryTime, confirmationLink}: FlightEventProps) {
   const month = departureTime.toLocaleString("en-US", { month: "short" })
   const day = departureTime.getDate()
   return (
@@ -26,7 +26,10 @@ export default function FlightEvent({ origin, destination, airline, departureTim
         {/* Bottom row — airline/time + confirmation */}
         <div className="plasmo-absolute plasmo-bottom-0 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-pb-2 plasmo-flex plasmo-justify-between plasmo-items-end">
           <div className="plasmo-flex plasmo-flex-col">
-            <span className="plasmo-text-foreground plasmo-text-p plasmo-font-normal">{airline}</span>
+            <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
+              <img src={airlinePhoto} className="plasmo-size-4 plasmo-rounded-sm plasmo-object-contain plasmo-shrink-0"/>
+              <span className="plasmo-text-foreground plasmo-text-p plasmo-font-normal">{airline}</span>
+            </div>
             <span className="plasmo-text-foreground plasmo-text-p">
               {formatTime(departureTime, militaryTime)} - {formatTime(arrivalTime, militaryTime)}
               {isNextDay(departureTime, arrivalTime) && (
@@ -34,9 +37,11 @@ export default function FlightEvent({ origin, destination, airline, departureTim
               )}
             </span>
           </div>
-          <Button size="xs" onClick={() => window.open(confirmationLink, "_blank")}>
-            Confirmation
-          </Button>
+          {confirmationLink && 
+            <Button size="xs" onClick={() => window.open(confirmationLink, "_blank")}>
+              Confirmation
+            </Button>
+          }
         </div>
 
       </div>

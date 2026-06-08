@@ -242,6 +242,7 @@ function Calendar({
               const isSelected = (ampm === 'PM' && isPM) || (ampm === 'AM' && !isPM)
               return (
                 <button
+                  type="button"
                   key={ampm}
                   onClick={() => handleTimeSelect('ampm', ampm as 'AM' | 'PM')}
                   className={cn(
@@ -298,6 +299,7 @@ export function DateTimePicker({
         <div className="plasmo-relative" ref={calendarRef}>
           <InputGroup className={error ? "plasmo-ring-2 plasmo-ring-destructive" : showCalendar ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
             <button
+              type="button"
               onClick={(e) => {
                 e.preventDefault()
                 setShowCalendar(!showCalendar)

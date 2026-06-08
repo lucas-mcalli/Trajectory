@@ -50,9 +50,11 @@ export default function StayEvent({ checkIn, checkOut, name, location, militaryT
         {/* Bottom row */}
         <div className="plasmo-absolute plasmo-bottom-0 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-pb-2 plasmo-flex plasmo-justify-between plasmo-items-end">
           <span className="plasmo-text-p plasmo-italic plasmo-text-shadow-md">-&gt; {checkOutMonth} {checkOutDay} · {formatTime(checkOut, militaryTime)}</span>
-          <Button size="xs" onClick={() => window.open(confirmationLink, "_blank")}>
-            Confirmation
-          </Button>
+          {confirmationLink && 
+            <Button size="xs" onClick={() => window.open(confirmationLink, "_blank")}>
+              Confirmation
+            </Button>
+          }
         </div>
 
       </div>

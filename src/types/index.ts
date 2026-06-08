@@ -5,6 +5,7 @@ export type Flight = {
   origin: string
   destination: string
   airline: string
+  airlinePhoto: string
   departureTime: Date
   arrivalTime: Date
   confirmationLink?: string
@@ -71,7 +72,7 @@ export type AirlineEntry = {
 export type AirlineComboboxProps = {
   label: string
   value?: string
-  onChange: (iata: string) => void
+  onChange: (name: string, airlinePhoto: string) => void
   placeholder?: string
   error? : string
   onOpen?: () => void

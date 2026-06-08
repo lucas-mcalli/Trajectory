@@ -60,14 +60,14 @@ export default function AirlineCombobox({
   }, [])
 
   function handleSelect(airline: AirlineEntry) {
-    onChange(airline.name)
+    onChange(airline.name, getLogoUrl(airline.domain))
     setOpen(false)
     setQuery("")
   }
 
   function handleClear(e: React.MouseEvent) {
     e.stopPropagation()
-    onChange("")
+    onChange("", "")
     setQuery("")
     inputRef.current?.focus()
   }

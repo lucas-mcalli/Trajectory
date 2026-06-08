@@ -15,7 +15,10 @@ const DaytripFormSchema = z.object({
   departureTime: z.date({ error: "Required" }),
   returnTime: z.date({ error: "Required" }),
   returnsNextDay: z.boolean(),
-  confirmationLink: z.url("Must be a valid URL").optional(),
+  confirmationLink: z
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal("")) // for empty confirmation link state
 })
 
 type DaytripFormValues = z.input<typeof DaytripFormSchema>
