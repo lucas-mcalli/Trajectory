@@ -83,13 +83,13 @@ export function TimePicker({
 
   return (
     <div className="plasmo-flex plasmo-w-full">
-      {/* <Field className="plasmo-flex plasmo-w-full plasmo-flex-col">
+      <Field className="plasmo-flex plasmo-w-full plasmo-flex-col">
         <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
           <FieldLabel>{label}</FieldLabel>
           {error && (
             <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
           )}
-        </div> */}
+        </div>
         <div className="plasmo-relative" ref={dropdownRef}>
           <InputGroup className={error ? "plasmo-ring-2 plasmo-ring-destructive" : showDropdown ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
             <button

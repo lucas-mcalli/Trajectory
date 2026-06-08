@@ -108,17 +108,15 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
         </div>
 
         {/* Return time block - exclusively uses TimePicker now */}
-        <div className="plasmo-flex plasmo-flex-col plasmo-gap-1.5">
-          <FieldLabel>Return Time</FieldLabel>
           <TimePicker
             value={form.watch("returnTime")}
+            label="Return Time"
             onChange={(date) => date && form.setValue("returnTime", date)}
             militaryTime={militaryTime}
             showNextDayIndicator={isReturnsNextDay}
             error={form.formState.errors.returnTime?.message}
             onOpen={() => form.clearErrors(`returnTime`)}
           />
-        </div>
 
         {/* Conditional Optional Confirmation Field Row */}
         {showConfirmationField ? (
