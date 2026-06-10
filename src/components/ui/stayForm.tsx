@@ -8,7 +8,7 @@ import { DateTimePicker } from "~components/ui/dateTimePicker"
 import { Field, FieldLabel } from "./field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group"
 import CitiesCombobox from "./citiesCombobox"
-import type { TripEvent } from "~types"
+import type { TimelineEvent } from "~types"
 
 const StayFormSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -33,7 +33,7 @@ const StayFormSchema = z.object({
 
 type StayFormValues = z.infer<typeof StayFormSchema>
 
-export default function StayForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TripEvent[]) => void}) {
+export default function StayForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void}) {
     const [showConfirmationField, setShowConfirmationField] = React.useState(false)
 
   const form = useForm<StayFormValues>({

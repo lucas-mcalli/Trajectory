@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { DateTimePicker } from "~components/ui/dateTimePicker"
 import AirportCombobox from "~components/ui/airportCombobox"
 import AirlineCombobox from "~components/ui/airlineCombobox"
-import type { TripEvent } from "~types"
+import type { TimelineEvent } from "~types"
 import { Field, FieldLabel } from "~/components/ui/field"
 import { InputGroup, InputGroupInput } from "~components/ui/input-group"
 
@@ -39,7 +39,7 @@ export const flightFormSchema = z.object({
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
-export default function FlightForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TripEvent[]) => void}) {
+export default function FlightForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void}) {
 
   const [showConfirmationField, setShowConfirmationField] = useState(false)
 

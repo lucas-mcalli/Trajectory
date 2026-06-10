@@ -3,7 +3,7 @@ import { fetchLocationPhoto, formatTime } from "~/helpers"
 import { Button } from "~/components/ui/button"
 import { useEffect, useState } from "react"
 
-export default function StayEvent({ checkIn, checkOut, name, location, militaryTime, flagLink, confirmationLink }: StayEventProps) {
+export default function StayEvent({ checkIn, checkOut, name, location, militaryTime, flagLink, confirmationLink, children, nested }: StayEventProps) {
   const checkInMonth = checkIn.toLocaleString("en-US", { month: "short" })
   const checkInDay = checkIn.getDate()
   const checkOutMonth = checkOut.toLocaleString("en-US", { month: "short" })
@@ -22,6 +22,12 @@ export default function StayEvent({ checkIn, checkOut, name, location, militaryT
     return Math.round((checkOut.getTime() - checkIn.getTime()) / msInDay)
   }
 
+  const getCardHeight = () => {
+  const baseHeight = getTotalNights() <= 1 ? 130 : getTotalNights() * 70
+  const daytripHeight = (nested?.length ?? 0) * 60 // ~60px per pill
+  return baseHeight + daytripHeight
+  }
+
   return (
     <div className="plasmo-inline-flex plasmo-justify-start plasmo-items-start plasmo-gap-6">
       <div className="plasmo-flex plasmo-flex-col plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
@@ -29,12 +35,18 @@ export default function StayEvent({ checkIn, checkOut, name, location, militaryT
         <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none plasmo-w-6 plasmo-text-center">{checkInDay}</span>
       </div>
 
-      <div className="plasmo-w-72 plasmo-relative plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden" style={{ height: `${getTotalNights() <= 1 ? 130 : getTotalNights() * 70}px` }}>
+      <div className="plasmo-w-72 plasmo-relative plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden" style={{ height: `${getCardHeight()}px`}}>
   
         {/* Background image or regular background if no image found */}
         {coverPhoto ? <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-cover plasmo-bg-center" style={{ backgroundImage: `url(${coverPhoto})` }} /> : null}
         {coverPhoto ? <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-white plasmo-opacity-70" /> : <div className="plasmo-bg-background-subtle plasmo-absolute plasmo-inset-0"/>}
         
+        {/* Middle — nested daytrips */}
+        {children && (
+          <div className="plasmo-absolute plasmo-inset-0 plasmo-flex plasmo-flex-col plasmo-justify-center plasmo-gap-1 plasmo-px-2 plasmo-pt-14 plasmo-pb-10">
+            {children}
+          </div>
+        )}
 
         {/* Top row */}
         <div className="plasmo-absolute plasmo-top-2 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-flex plasmo-justify-between plasmo-items-start">

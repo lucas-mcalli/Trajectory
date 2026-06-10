@@ -20,6 +20,8 @@ export type Stay = {
   location: string
   flagLink: string
   confirmationLink?: string
+  children?: React.ReactNode
+  nested?: Daytrip[]
 }
 
 export type Daytrip = {
@@ -109,4 +111,17 @@ export type TimePickerProps = {
   onOpen?: () => void
 }
 
-export type TripEvent = Flight | Stay | Daytrip
+export type TimelineEvent = Flight | Stay | Daytrip
+
+export type Trip = {
+  id: string
+  name: string
+  outboundFlight?: Flight
+  returnFlight?: Flight
+  events: TimelineEvent[]
+  coverPhotoUrl?: string
+  createdAt: string
+  startDate?: Date
+  endDate?: Date
+  destinationCount?: number
+}

@@ -20,15 +20,20 @@ export default function DaytripEvent({
     const day = departureTime.getDate()
 
     return (
-      <div className="plasmo-w-full plasmo-max-w-md plasmo-bg-background-subtle plasmo-border plasmo-border-border plasmo-rounded-md plasmo-p-2 plasmo-flex plasmo-flex-col plasmo-gap-0.5">
-        <div className="plasmo-text-foreground plasmo-text-p plasmo-italic">
-          {month} {day}
+      <div className="plasmo-w-full plasmo-max-w-md plasmo-bg-background-subtle plasmo-border plasmo-border-border plasmo-rounded-md plasmo-p-2 plasmo-flex plasmo-flex-col plasmo-gap-2">
+        <div className="plasmo-text-foreground plasmo-text-p plasmo-font-semibold">
+          {name}
         </div>
-        <div className="plasmo-text-foreground plasmo-text-p">
-          {name} · {formatTime(departureTime, militaryTime)} - {formatTime(returnTime, militaryTime)}
-          {returnsNextDay && (
-            <sup className="plasmo-text-p-sm plasmo-font-bold plasmo-ml-0.5">+1</sup>
-          )}
+        <div className=" plasmo-flex plasmo-justify-between plasmo-gap-8 plasmo-text-foreground">
+          <div className="plasmo-text-foreground plasmo-text-p">
+            {month} {day}
+          </div>
+          <div className="plasmo-text-foreground plasmo-text-p">
+            {formatTime(departureTime, militaryTime)} - {formatTime(returnTime, militaryTime)}
+            {returnsNextDay && (
+              <sup className="plasmo-text-p-sm plasmo-font-bold plasmo-ml-0.5">+1</sup>
+            )}
+          </div>
         </div>
       </div>
     )

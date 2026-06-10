@@ -5,6 +5,7 @@ import { cn } from "~/lib/utils"
 import { Field, FieldLabel } from "~/components/ui/field"
 import { InputGroup, InputGroupAddon } from "~/components/ui/input-group"
 import type { DateTimeInputProps, CalendarState} from "~/types"
+import * as ReactDOM from "react-dom"
 
 
 function formatDisplayDateTime(date: Date | undefined, militaryTime?: boolean): string {
@@ -131,7 +132,7 @@ function Calendar({
   const pad = (n: number) => String(n).padStart(2, "0")
 
   return (
-    <div className="plasmo-absolute plasmo-top-full plasmo-right-0 plasmo-mt-2 plasmo-bg-background plasmo-border plasmo-border-input plasmo-rounded-md plasmo-shadow-lg plasmo-p-4 plasmo-z-50 plasmo-flex plasmo-gap-4">
+    <div className="plasmo-flex plasmo-gap-4">
       
       {/* --- Left Side: Calendar --- */}
       <div className="plasmo-w-64">
@@ -274,6 +275,9 @@ export function DateTimePicker({
   const [showCalendar, setShowCalendar] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
 
+  const [calendarPos, setCalendarPos] = React.useState({ top: 0, left: 0 })
+  const triggerRef = React.useRef<HTMLDivElement>(null)
+
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -296,14 +300,18 @@ export function DateTimePicker({
             <p className="plasmo-text-xs plasmo-text-destructive">{error}</p>
           )}
         </div>
-        <div className="plasmo-relative" ref={calendarRef}>
+        <div className="plasmo-relative" ref={triggerRef}>
           <InputGroup className={error ? "plasmo-ring-2 plasmo-ring-destructive" : showCalendar ? "plasmo-ring-2 plasmo-ring-ring" : ""}>
             <button
               type="button"
               onClick={(e) => {
                 e.preventDefault()
+                if (!showCalendar && triggerRef.current) {
+                  const rect = triggerRef.current.getBoundingClientRect()
+                  setCalendarPos({ top: rect.bottom + 8, left: rect.right })
+                }
                 setShowCalendar(!showCalendar)
-                if (!showCalendar) onOpen?.() // allows the error to be cleared when the field is reopened
+                if (!showCalendar) onOpen?.()
               }}
               className={cn(
                 "plasmo-flex-1 plasmo-text-left plasmo-rounded-none plasmo-border-0 plasmo-bg-transparent plasmo-px-2 plasmo-py-2 plasmo-text-sm plasmo-shadow-none",
@@ -321,13 +329,15 @@ export function DateTimePicker({
             </InputGroupAddon>
           </InputGroup>
 
-          {showCalendar && (
-            <Calendar
-              selectedDate={value}
-              onDateSelect={onChange}
-              militaryTime={militaryTime}
-              defaultMonth={defaultMonth}
-            />
+          {showCalendar && ReactDOM.createPortal(
+            <div
+              ref={calendarRef}
+              style={{ position: "fixed", top: calendarPos.top, left: calendarPos.left, zIndex: 9999, transform: "translateX(-100%)" }}
+              className="plasmo-bg-background plasmo-border plasmo-border-input plasmo-rounded-md plasmo-shadow-lg plasmo-p-4 plasmo-flex plasmo-gap-4"
+            >
+              <Calendar selectedDate={value} onDateSelect={onChange} militaryTime={militaryTime} defaultMonth={defaultMonth} />
+            </div>,
+            document.body
           )}
         </div>
       </Field>
