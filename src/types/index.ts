@@ -124,4 +124,20 @@ export type Trip = {
   startDate?: Date
   endDate?: Date
   destinationCount?: number
+  regionId?: string
 }
+
+export type RegionComboboxProps = {
+  label: string
+  value?: string       // region id
+  onChange: (id: string) => void
+  placeholder?: string
+  error?: string
+}
+
+export type Region = { 
+  id: string
+  label: string 
+}
+
+export type Tabs = "home" | "tripScreen" | "onboarding" | "createTrip"

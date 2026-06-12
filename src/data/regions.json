@@ -1,0 +1,22 @@
+[
+  { "id": "northeastern-us", "label": "Northeastern US" },
+  { "id": "southern-us", "label": "Southern US" },
+  { "id": "western-us", "label": "Western US" },
+  { "id": "canada", "label": "Canada" },
+  { "id": "mexico-central-america", "label": "Mexico & Central America" },
+  { "id": "caribbean", "label": "Caribbean" },
+  { "id": "south-america", "label": "South America" },
+  { "id": "western-europe", "label": "Western Europe" },
+  { "id": "southern-europe", "label": "Southern Europe" },
+  { "id": "northern-europe", "label": "Northern Europe" },
+  { "id": "eastern-europe", "label": "Eastern Europe" },
+  { "id": "middle-east", "label": "Middle East" },
+  { "id": "north-africa", "label": "North Africa" },
+  { "id": "sub-saharan-africa", "label": "Sub-Saharan Africa" },
+  { "id": "south-asia", "label": "South Asia" },
+  { "id": "southeast-asia", "label": "Southeast Asia" },
+  { "id": "east-asia", "label": "East Asia" },
+  { "id": "japan-korea", "label": "Japan & Korea" },
+  { "id": "australia-nz", "label": "Australia & New Zealand" },
+  { "id": "pacific-islands", "label": "Pacific Islands" }
+]

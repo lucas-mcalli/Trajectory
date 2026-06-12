@@ -8,7 +8,7 @@ import { DateTimePicker } from "~components/ui/dateTimePicker"
 import { TimePicker } from "~/components/ui/timePicker"
 import { Field, FieldLabel } from "./field"
 import { InputGroup, InputGroupInput } from "./input-group"
-import type { TripEvent } from "~types"
+import type { TimelineEvent } from "~types"
 
 const DaytripFormSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -23,7 +23,7 @@ const DaytripFormSchema = z.object({
 
 type DaytripFormValues = z.input<typeof DaytripFormSchema>
 
-export default function DaytripForm({ militaryTime, addEvents }: { militaryTime: boolean, addEvents: (event: TripEvent[]) => void }) {
+export default function DaytripForm({ militaryTime, addEvents }: { militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void }) {
   const [showConfirmationField, setShowConfirmationField] = React.useState(false)
 
   const form = useForm<DaytripFormValues>({
