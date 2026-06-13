@@ -1,3 +1,5 @@
+import type { TimelineEvent } from "~types"
+
 export const isNextDay = (departureTime: Date, arrivalTime: Date): boolean => {
   return arrivalTime.getDate() !== departureTime.getDate()
 }
@@ -26,3 +28,18 @@ export const fetchLocationPhoto = async (location: string): Promise<string | nul
     return null
   }
 }
+
+export const getEventStartTime = (event: TimelineEvent) => {
+  if (event.type === "flight" || event.type === "daytrip") return new Date (event.departureTime)
+  else return event.checkIn
+}
+
+export const getEventEndTime = (event:TimelineEvent ) => {
+  if (event.type === "flight") return new Date(event.arrivalTime)
+  if (event.type === "daytrip") return new Date(event.returnTime)
+  else return event.checkOut
+}
+
+export const sorted = (events: TimelineEvent[]) => [...events].sort((a,b) => // .sort() doesnt take a boolean like c++, if you return a negative number, a goes before, 0 = no change, and positive number means b goes before a.
+  getEventStartTime(a).getTime() - getEventStartTime(b).getTime()
+)

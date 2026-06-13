@@ -3,7 +3,7 @@ import type { Trip } from "~/types"
 import TripFormPreview from "~components/ui/tripFormPreview"
 import { useState } from "react" 
 
-export default function CreateTripScreen({ onComplete }: { onComplete: (trip: Trip) => void }) {
+export default function CreateTripScreen({ onComplete }: { onComplete: (trip: Trip) => void; }) {
   const [selectedRegionId, setSelectedRegionId] = useState<string>("")
 
   return (

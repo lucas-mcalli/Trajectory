@@ -9,6 +9,8 @@ import AirlineCombobox from "~components/ui/airlineCombobox"
 import type { TimelineEvent } from "~types"
 import { Field, FieldLabel } from "~/components/ui/field"
 import { InputGroup, InputGroupInput } from "~components/ui/input-group"
+import { X } from "lucide-react"
+import { useRightPanel } from "~context/rightPanelContext"
 
 const singleFlightSchema = z.object({
   origin: z.string().min(1, "Required"),
@@ -40,6 +42,8 @@ export const flightFormSchema = z.object({
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
 export default function FlightForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void}) {
+
+  const {setPanel} = useRightPanel()
 
   const [showConfirmationField, setShowConfirmationField] = useState(false)
 
@@ -81,7 +85,10 @@ const onSubmit = (values: FlightFormValues) => {
 
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4">
-      <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new flight</h1>
+      <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
+        <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new flight</h1>
+        <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><X /></button>
+      </div>
       <form
         className="plasmo-flex plasmo-flex-col plasmo-gap-4"
         onSubmit={form.handleSubmit(onSubmit, (errors) => console.log("validation errors", errors))}

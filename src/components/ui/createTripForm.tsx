@@ -39,7 +39,6 @@ export default function CreateTripForm({ onComplete, onChangeRegion }: { onCompl
       name: values.name,
       events: [],
       coverPhotoUrl: coverPhotoUrl ?? undefined,
-      createdAt: new Date().toISOString(),
       regionId: values.regionId,
     }
 

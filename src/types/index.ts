@@ -116,14 +116,10 @@ export type TimelineEvent = Flight | Stay | Daytrip
 export type Trip = {
   id: string
   name: string
-  outboundFlight?: Flight
-  returnFlight?: Flight
   events: TimelineEvent[]
   coverPhotoUrl?: string
-  createdAt: string
   startDate?: Date
   endDate?: Date
-  destinationCount?: number
   regionId?: string
 }
 

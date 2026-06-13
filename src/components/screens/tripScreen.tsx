@@ -6,6 +6,7 @@ import type { TimelineEvent, Trip } from "~types"
 import React, { useState } from "react"
 import { useStorage } from "@plasmohq/storage/hook"
 import { useRightPanel } from "~context/rightPanelContext"
+import AmbientCard from "~components/ui/ambientCard"
 
 
 export default function TripScreen({ trip, militaryTime }: { trip: Trip, militaryTime: boolean }) {
@@ -49,7 +50,7 @@ export default function TripScreen({ trip, militaryTime }: { trip: Trip, militar
         <Timeline events={events} militaryTime={militaryTime} />
       </div>
       <div style={{ scrollbarWidth: "none" }} className="USER EDIT SIDE plasmo-py-4 plasmo-overflow-y-auto plasmo-h-full plasmo-flex plasmo-flex-col plasmo-gap-10 plasmo-px-1">
-        {panel === "ambient" && <FlightForm militaryTime={militaryTime} addEvents={addEvents} />}
+        {panel === "ambient" && <AmbientCard trip={trip} />}
         {panel === "flight" && <FlightForm militaryTime={militaryTime} addEvents={addEvents} />}
         {panel === "stay" && <StayForm militaryTime={militaryTime} addEvents={addEvents} />}
         {panel === "daytrip" && <DaytripForm militaryTime={militaryTime} addEvents={addEvents} />}

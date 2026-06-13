@@ -33,10 +33,7 @@ export default function TripEvent({ trip, onClick }: { trip: Trip & { startDate?
       <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-gradient-to-t plasmo-from-black/70 plasmo-via-black/10 plasmo-to-transparent" />
 
       {/* Top row */}
-      <div className="plasmo-absolute plasmo-top-0 plasmo-left-0 plasmo-w-full plasmo-px-3 plasmo-pt-3 plasmo-flex plasmo-justify-between plasmo-items-start">
-        <span className="plasmo-text-white/90 plasmo-text-p-sm plasmo-font-medium plasmo-bg-black/20 plasmo-rounded-md plasmo-px-2 plasmo-py-0.5">
-          {trip.destinationCount ?? 0} {trip.destinationCount === 1 ? "destination" : "destinations"}
-        </span>
+      <div className="plasmo-absolute plasmo-top-0 plasmo-left-0 plasmo-w-full plasmo-px-3 plasmo-pt-3 plasmo-flex plasmo-justify-end plasmo-items-start">
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen) }}
           className="plasmo-text-white/80 hover:plasmo-text-white plasmo-transition-colors plasmo-p-1"

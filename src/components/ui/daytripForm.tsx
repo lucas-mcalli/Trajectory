@@ -9,6 +9,9 @@ import { TimePicker } from "~/components/ui/timePicker"
 import { Field, FieldLabel } from "./field"
 import { InputGroup, InputGroupInput } from "./input-group"
 import type { TimelineEvent } from "~types"
+import { X } from "lucide-react"
+import { useRightPanel } from "~context/rightPanelContext"
+ 
 
 const DaytripFormSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -50,10 +53,15 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
     }])
   }
 
+  const { setPanel } = useRightPanel()
+
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4 plasmo-w-full plasmo-max-w-md">
-      <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new daytrip</h1>
-      
+      <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
+        <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new daytrip</h1>
+        <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><X /></button>
+      </div>
+
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         {/* Name input */}
           <Field className="plasmo-flex-[3]">

@@ -9,6 +9,8 @@ import { Field, FieldLabel } from "./field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group"
 import CitiesCombobox from "./citiesCombobox"
 import type { TimelineEvent } from "~types"
+import { X } from "lucide-react"
+import { useRightPanel } from "~context/rightPanelContext"
 
 const StayFormSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -63,10 +65,15 @@ export default function StayForm ({militaryTime, addEvents}: {militaryTime: bool
     }])
   }
 
+  const { setPanel } = useRightPanel()
+
 
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4">
-      <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new stay</h1>
+      <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
+        <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new stay</h1>
+        <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><X /></button>
+      </div>
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="plasmo-flex plasmo-gap-4">
           <Field className="plasmo-flex-[3]">
