@@ -12,7 +12,7 @@ import type { TimelineEvent } from "~types"
 import { X } from "lucide-react"
 import { useRightPanel } from "~context/rightPanelContext"
 
-const StayFormSchema = z.object({
+const createStayFormSchema = (existingEvents: TimelineEvent[]) => z.object({
   name: z.string().min(1, "Required"),
   guests: z.number().min(1, { error: "At least 1 guest" }),
   location: z.string().min(1, "Required"),
@@ -31,12 +31,21 @@ const StayFormSchema = z.object({
       path: ["checkOutTime"]
     })
   }
+
+  if (existingEvents.some((event) => event.type === "stay" && data.checkInTime < event.checkOut && data.checkOutTime > event.checkIn)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "This stay overlaps an existing stay",
+      path: ["checkInTime"]
+    })
+  }
 })
 
-type StayFormValues = z.infer<typeof StayFormSchema>
+type StayFormValues = z.infer<ReturnType<typeof createStayFormSchema>>
 
-export default function StayForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void}) {
+export default function StayForm ({militaryTime, addEvents, events}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[]}) {
     const [showConfirmationField, setShowConfirmationField] = React.useState(false)
+  const StayFormSchema = React.useMemo(() => createStayFormSchema(events), [events])
 
   const form = useForm<StayFormValues>({
     resolver: zodResolver(StayFormSchema),
@@ -55,6 +64,7 @@ export default function StayForm ({militaryTime, addEvents}: {militaryTime: bool
     console.log("errors", form.formState.errors)
     addEvents([{
       type: "stay",
+      id: crypto.randomUUID(),
       name: values.name,
       guests: values.guests,
       location: values.location,
@@ -63,6 +73,7 @@ export default function StayForm ({militaryTime, addEvents}: {militaryTime: bool
       flagLink: values.flagLink,
       confirmationLink: values.confirmationLink
     }])
+    setPanel('ambient')
   }
 
   const { setPanel } = useRightPanel()

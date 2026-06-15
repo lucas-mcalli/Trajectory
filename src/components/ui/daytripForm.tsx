@@ -27,6 +27,7 @@ const DaytripFormSchema = z.object({
 type DaytripFormValues = z.input<typeof DaytripFormSchema>
 
 export default function DaytripForm({ militaryTime, addEvents }: { militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void }) {
+
   const [showConfirmationField, setShowConfirmationField] = React.useState(false)
 
   const form = useForm<DaytripFormValues>({
@@ -44,6 +45,7 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
   const onSubmit = (values: DaytripFormValues) => {
     addEvents([{
       type: "daytrip",
+      id: crypto.randomUUID(),
       name: values.name,
       departureTime: values.departureTime,
       returnTime: values.returnTime,
@@ -51,6 +53,7 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
       confirmationLink: values.confirmationLink,
       isActiveDuringStay: false, // This can be enhanced later to check against stay dates
     }])
+    setPanel('ambient')
   }
 
   const { setPanel } = useRightPanel()

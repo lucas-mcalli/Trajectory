@@ -37,7 +37,6 @@ export default function CreateTripForm({ onComplete, onChangeRegion }: { onCompl
     const newTrip: Trip = {
       id: String(Date.now()),
       name: values.name,
-      events: [],
       coverPhotoUrl: coverPhotoUrl ?? undefined,
       regionId: values.regionId,
     }

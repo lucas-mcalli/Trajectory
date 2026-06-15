@@ -28,7 +28,7 @@ export default function IndexPopup() {
             <TripScreen trip={selectedTrip} militaryTime={militaryTime} />
           </RightPanelProvider>
         )}
-        {activeTab === "createTrip" && <CreateTripScreen onComplete={(trip) => {setTrips((prevTrips) => [...prevTrips, trip]); setSelectedTrip(trip); setActiveTab("tripScreen"); }} />}
+        {activeTab === "createTrip" && <CreateTripScreen onComplete={(trip) => {setTrips((prevTrips) => [...prevTrips || [], trip]); setSelectedTrip(trip); setActiveTab("tripScreen"); }} />}
       </main>
     </div>
   )

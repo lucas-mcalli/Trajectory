@@ -1,17 +1,10 @@
 import { useState } from "react"
 import { MoreHorizontal } from "lucide-react"
-import type { Trip } from "~types";
+import type { Trip, TimelineEvent } from "~types";
 import React from "react"
+import { formatDateRange, startDate, endDate } from "~helpers";
 
-function formatDateRange(start: Date | undefined, end: Date | undefined): string {
-  if (!start) return "Dates not set"
-  const startStr = start.toLocaleDateString("en-US", { month: "long", day: "numeric" })
-  if (!end) return `${startStr} – ?`
-  const endStr = end.toLocaleDateString("en-US", { month: "long", day: "numeric" })
-  return `${startStr} – ${endStr}`
-}
-
-export default function TripEvent({ trip, onClick }: { trip: Trip & { startDate?: Date; endDate?: Date; destinationCount?: number }; onClick: () => void }) {
+export default function TripEvent({ trip, events, onClick }: { trip: Trip ; events: TimelineEvent[];  onClick: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -44,9 +37,9 @@ export default function TripEvent({ trip, onClick }: { trip: Trip & { startDate?
 
       {/* Bottom row */}
       <div className="plasmo-absolute plasmo-bottom-0 plasmo-left-0 plasmo-w-full plasmo-px-3 plasmo-pb-3">
-        <p className="plasmo-text-white plasmo-text-h4 plasmo-font-semibold plasmo-leading-tight">{trip.name}</p>
+        <p className="plasmo-text-white plasmo-text-h4 plasmo-font-semibold plasmo-leading-tight plasmo-truncate">{trip.name}</p>
         <p className="plasmo-text-white/80 plasmo-text-p-sm plasmo-font-medium plasmo-mt-0.5">
-          {formatDateRange(trip.startDate, trip.endDate)}
+          {formatDateRange(startDate(events), endDate(events))}
         </p>
       </div>
 

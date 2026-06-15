@@ -1,64 +1,56 @@
 import React, { useEffect, useState } from "react";
-import type { Trip } from "~types";
-import { getEventStartTime, getEventEndTime, sorted, fetchLocationPhoto } from "~helpers";
+import type { Trip, TimelineEvent } from "~types";
+import { getEventStartTime, getEventEndTime, sorted, fetchLocationPhoto, formatDateRange} from "~helpers";
 import { Plus, Plane, Bed, MapPin } from "lucide-react";
 import { useRightPanel } from "~context/rightPanelContext"
 import { regionPreviews } from "~data/regionPreviews";
+import { startDate, endDate } from "~helpers";
 
-function formatDateRange(start: Date | undefined, end: Date | undefined): string {
-  if (!start) return "Dates not set";
-  const startStr = start.toLocaleDateString("en-US", { month: "long", day: "numeric" });
-  if (!end) return `${startStr} – ?`;
-  const endStr = end.toLocaleDateString("en-US", { month: "long", day: "numeric" });
-  return `${startStr} – ${endStr}`;
-}
-
-export default function AmbientCard({ trip }: { trip: Trip }) {
+export default function AmbientCard({ trip, events }: { trip: Trip, events: TimelineEvent[] }) {
   const [fabOpen, setFabOpen] = useState(false);
-
-  const startDate = (() => {
-    if (trip?.startDate) return trip.startDate;
-    if (trip?.events && trip.events.length > 0) {
-      return getEventStartTime(sorted(trip.events)[0]);
-    }
-    return undefined;
-  })();
-
-  const endDate = (() => {
-    if (trip?.endDate) return trip.endDate;
-    if (trip?.events && trip.events.length > 0) {
-      return getEventEndTime(sorted(trip.events)[trip.events.length - 1]);
-    }
-    return undefined;
-  })();
-
   const { setPanel } = useRightPanel();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
-  // Fetch the photo when the trip or regionId changes
-  useEffect(() => {
-    async function getBackgroundImage() {
-      if (!trip?.regionId) return;
+useEffect(() => {
+    let isMounted = true;
 
-      const citiesInRegion = regionPreviews[trip.regionId];
-      
-      let queryText = "travel"; // default fallback
-
-      if (citiesInRegion && citiesInRegion.length > 0) {
-        const randomIndex = Math.floor(Math.random() * citiesInRegion.length);
-        const randomCityObj = citiesInRegion[randomIndex];
-        
-        queryText = `${randomCityObj.city}, ${randomCityObj.country}`;
-      } else {
-        queryText = trip.regionId.replace("-", " ");
+    async function loadPhoto() {
+      if (!trip?.regionId || !(trip.regionId in regionPreviews)) {
+        if (trip?.name) {
+          try {
+            const url = await fetchLocationPhoto(trip.name);
+            if (isMounted && url) setPhotoUrl(url);
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        return;
       }
 
-      const final = await fetchLocationPhoto(queryText);
-      setPhotoUrl(final);
+      const citiesInRegion = regionPreviews[trip.regionId];
+      let locationQuery = trip.name;
+
+      if (citiesInRegion && citiesInRegion.length > 0) {
+        const firstDestination = citiesInRegion[0];
+        locationQuery = `${firstDestination.city}, ${firstDestination.country}`;
+      }
+
+      try {
+        const url = await fetchLocationPhoto(locationQuery);
+        if (isMounted && url) {
+          setPhotoUrl(url);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
 
-    getBackgroundImage();
-  }, [trip?.regionId]);
+    loadPhoto();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [trip?.regionId, trip?.name]);
 
   return (
     <div className="plasmo-relative plasmo-overflow-hidden plasmo-w-full plasmo-h-full plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-bg-background plasmo-p-4 plasmo-flex plasmo-flex-col plasmo-justify-between">
@@ -74,11 +66,11 @@ export default function AmbientCard({ trip }: { trip: Trip }) {
       <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-gradient-to-b plasmo-from-black/40 plasmo-via-transparent plasmo-to-black/80" />
 
       <div className="plasmo-flex plasmo-flex-col">
-        <h4 className="plasmo-text-white plasmo-z-10 plasmo-text-h4 plasmo-font-semibold plasmo-leading-tight">
+        <h4 className="plasmo-text-white plasmo-z-10 plasmo-text-h4 plasmo-font-semibold plasmo-leading-tight plasmo-truncate">
           {trip.name}
         </h4>
         <p className="plasmo-text-white plasmo-opacity-80 plasmo-text-p-sm plasmo-z-10 plasmo-font-medium plasmo-mt-0.5">
-          {formatDateRange(startDate, endDate)}
+          {formatDateRange(startDate(events), endDate(events))}
         </p>
       </div>
 

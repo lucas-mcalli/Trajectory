@@ -1,9 +1,9 @@
 import type { FlightEventProps } from "~/types"
 import { isNextDay, formatTime } from "~/helpers"
-import { Plane } from "lucide-react"
+import { Plane, Trash2 } from "lucide-react"
 import { Button } from "~/components/ui/button"
 
-export default function FlightEvent({ origin, destination, airline, airlinePhoto, departureTime, arrivalTime, militaryTime, confirmationLink}: FlightEventProps) {
+export default function FlightEvent({ id, origin, destination, airline, airlinePhoto, departureTime, arrivalTime, militaryTime, confirmationLink, onDelete}: FlightEventProps & { onDelete: (id: string) => void }) {
   const month = departureTime.toLocaleString("en-US", { month: "short" })
   const day = departureTime.getDate()
   return (
@@ -11,6 +11,9 @@ export default function FlightEvent({ origin, destination, airline, airlinePhoto
       <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0 plasmo-w-6">
         <span className="plasmo-text-black plasmo-text-p plasmo-font-normal">{month}</span>
         <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none">{day}</span>
+        <button onClick={() => onDelete(id)} className="plasmo-mt-3 plasmo-text-foreground/70 hover:plasmo-text-destructive plasmo-transition-colors">
+          <Trash2 className="plasmo-size-4" />
+        </button>
       </div>
 
       <div className="plasmo-w-72 plasmo-h-28 plasmo-relative plasmo-bg-background-subtle plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden">

@@ -2,6 +2,7 @@
 // Stored types — go in events array
 export type Flight = {
   type: "flight"
+  id: string
   origin: string
   destination: string
   airline: string
@@ -13,6 +14,7 @@ export type Flight = {
 
 export type Stay = {
   type: "stay"
+  id: string
   name: string
   guests: number
   checkIn: Date
@@ -26,6 +28,7 @@ export type Stay = {
 
 export type Daytrip = {
   type: "daytrip"
+  id: string
   name: string
   departureTime: Date
   returnTime: Date
@@ -116,10 +119,7 @@ export type TimelineEvent = Flight | Stay | Daytrip
 export type Trip = {
   id: string
   name: string
-  events: TimelineEvent[]
   coverPhotoUrl?: string
-  startDate?: Date
-  endDate?: Date
   regionId?: string
 }
 

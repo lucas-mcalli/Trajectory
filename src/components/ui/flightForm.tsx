@@ -72,6 +72,7 @@ export default function FlightForm ({militaryTime, addEvents}: {militaryTime: bo
 const onSubmit = (values: FlightFormValues) => {
   addEvents(values.flights.map(flight => ({
     type: "flight" as const,
+    id: crypto.randomUUID(),
     origin: flight.origin,
     destination: flight.destination,
     airline: flight.airline,
@@ -80,6 +81,7 @@ const onSubmit = (values: FlightFormValues) => {
     arrivalTime: flight.arrivalTime,
     confirmationLink: values.confirmationLink || undefined
   })))
+  setPanel('ambient')
 }
 
 

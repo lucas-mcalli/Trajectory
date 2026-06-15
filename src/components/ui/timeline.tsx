@@ -8,7 +8,7 @@ import type { Daytrip } from "~types"
 import { render } from "react-dom"
 import { getEventStartTime, getEventEndTime, sorted} from "~helpers"
 
-export default function Timeline({ events, militaryTime }: { events: TimelineEvent[], militaryTime: boolean }) {
+export default function Timeline({ events, militaryTime, onDelete }: { events: TimelineEvent[], militaryTime: boolean, onDelete: (id: string) => void }) {
 
   const isDaytripActiveDuringStay = (daytrip: Daytrip): boolean => { // this goes thru the events array and determines if daytrips happen during active stays
     return sorted(events).some(event => {
@@ -48,15 +48,15 @@ export default function Timeline({ events, militaryTime }: { events: TimelineEve
         const next = renderList[i+1]
         return (
           <div key={i}>
-            {event.type === "flight" && <FlightEvent {...event} militaryTime={militaryTime}/>}
+            {event.type === "flight" && <FlightEvent {...event} militaryTime={militaryTime} onDelete={onDelete}/>} 
             {event.type === "stay" && (
-              <StayEvent {...event} militaryTime={militaryTime}>
+              <StayEvent {...event} militaryTime={militaryTime} onDelete={onDelete}>
                 {event.nested?.map((daytrip, j) => (
-                  <DaytripEvent key={j} {...daytrip} militaryTime={militaryTime} isActiveDuringStay={true} />
+                  <DaytripEvent key={j} {...daytrip} militaryTime={militaryTime} isActiveDuringStay={true} onDelete={onDelete} />
                 ))}
               </StayEvent>
               )}
-            {event.type === "daytrip" && <DaytripEvent {...event} militaryTime={militaryTime} isActiveDuringStay={isDaytripActiveDuringStay(event)} />}
+            {event.type === "daytrip" && <DaytripEvent {...event} militaryTime={militaryTime} isActiveDuringStay={isDaytripActiveDuringStay(event)} onDelete={onDelete} />}
             {next && getEventStartTime(next).getTime() - getEventEndTime(event).getTime() > (30*60*1000) && (
               <Gap precedingArrivalTime={getEventEndTime(event)} followingDepartureTime={getEventStartTime(next)} />
             )}

@@ -2,8 +2,9 @@ import type { StayEventProps } from "~/types"
 import { fetchLocationPhoto, formatTime } from "~/helpers"
 import { Button } from "~/components/ui/button"
 import { useEffect, useState } from "react"
+import { Trash2 } from "lucide-react"
 
-export default function StayEvent({ checkIn, checkOut, name, location, militaryTime, flagLink, confirmationLink, children, nested }: StayEventProps) {
+export default function StayEvent({ checkIn, checkOut, name, location, militaryTime, flagLink, confirmationLink, children, nested, onDelete, id }: StayEventProps & { onDelete: (id: string) => void }) {
   const checkInMonth = checkIn.toLocaleString("en-US", { month: "short" })
   const checkInDay = checkIn.getDate()
   const checkOutMonth = checkOut.toLocaleString("en-US", { month: "short" })
@@ -30,9 +31,12 @@ export default function StayEvent({ checkIn, checkOut, name, location, militaryT
 
   return (
     <div className="plasmo-inline-flex plasmo-justify-start plasmo-items-start plasmo-gap-6">
-      <div className="plasmo-flex plasmo-flex-col plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
+      <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-leading-none plasmo-gap-0 plasmo-shrink-0">
         <span className="plasmo-text-black plasmo-text-p">{checkInMonth}</span>
         <span className="plasmo-text-black plasmo-text-lg plasmo-font-semibold plasmo-leading-none plasmo-w-6 plasmo-text-center">{checkInDay}</span>
+        <button onClick={() => onDelete(id)} className="plasmo-mt-4 plasmo-text-foreground/70 hover:plasmo-text-destructive plasmo-transition-colors">
+          <Trash2 className="plasmo-size-4" />
+        </button>
       </div>
 
       <div className="plasmo-w-72 plasmo-relative plasmo-rounded-lg plasmo-border plasmo-border-border plasmo-overflow-hidden" style={{ height: `${getCardHeight()}px`}}>
@@ -52,7 +56,7 @@ export default function StayEvent({ checkIn, checkOut, name, location, militaryT
         <div className="plasmo-absolute plasmo-top-2 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-flex plasmo-justify-between plasmo-items-start">
           <div className="plasmo-flex plasmo-flex-col">
             <span className="plasmo-text-p plasmo-italic plasmo-text-shadow-md">&lt;- {checkInMonth} {checkInDay} · {formatTime(checkIn, militaryTime)}</span>
-            <span className="plasmo-text-h4 plasmo-font-semibold plasmo-text-shadow-md">{name}</span>
+            <span className="plasmo-text-foreground plasmo-text-h4 plasmo-font-semibold plasmo-truncate plasmo-max-w-[220px]">{name}</span>
           </div>
           <div className="plasmo-size-8 plasmo-shrink-0">
             <img src={flagLink} alt="Flag" className="plasmo-w-full plasmo-h-full plasmo-object-contain" />

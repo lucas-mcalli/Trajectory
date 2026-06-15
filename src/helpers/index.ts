@@ -36,10 +36,34 @@ export const getEventStartTime = (event: TimelineEvent) => {
 
 export const getEventEndTime = (event:TimelineEvent ) => {
   if (event.type === "flight") return new Date(event.arrivalTime)
-  if (event.type === "daytrip") return new Date(event.returnTime)
+  if (event.type === "daytrip") return new Date(event.returnTime.getTime() + (event.returnsNextDay ? 24 * 60 * 60 * 1000 : 0))
   else return event.checkOut
 }
 
 export const sorted = (events: TimelineEvent[]) => [...events].sort((a,b) => // .sort() doesnt take a boolean like c++, if you return a negative number, a goes before, 0 = no change, and positive number means b goes before a.
   getEventStartTime(a).getTime() - getEventStartTime(b).getTime()
 )
+
+export const formatDateRange = (start: Date | undefined, end: Date | undefined): string => {
+  if (!start) return "Dates not set"
+  const startStr = start.toLocaleDateString("en-US", { month: "long", day: "numeric" })
+  if (!end) return `${startStr} – ?`
+  const endStr = end.toLocaleDateString("en-US", { month: "long", day: "numeric" })
+  return `${startStr} – ${endStr}`
+}
+
+export const startDate = (events : TimelineEvent[]) => {
+  if (events &&events.length > 0) {
+    return getEventStartTime(sorted(events)[0])
+  }
+  return undefined;
+}
+
+export const endDate = (events : TimelineEvent[]) => {
+  if (events &&events.length > 0) {
+    return getEventEndTime(sorted(events)[events.length - 1])
+  }
+  return undefined;
+}
+
+
