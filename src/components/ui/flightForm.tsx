@@ -247,7 +247,7 @@ const onSubmit = (values: FlightFormValues) => {
 
         <button
           type="submit"
-          className="plasmo-bg-primary plasmo-text-white plasmo-text-p plasmo-font-semibold plasmo-w-fit plasmo-h-8 plasmo-rounded-md plasmo-px-3 plasmo-self-end"
+          className="plasmo-bg-primary plasmo-text-white plasmo-text-p plasmo-font-semibold plasmo-w-fit plasmo-h-9 plasmo-rounded-md plasmo-px-3 plasmo-self-end"
         >
           Save flight{fields.length > 1 && "s"}
         </button>

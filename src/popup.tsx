@@ -20,7 +20,7 @@ export default function IndexPopup() {
 
   return (
     <div style={{scrollbarWidth: "none" }} className="plasmo-h-[600px] plasmo-w-[775px] plasmo-rounded-md plasmo-flex plasmo-flex-col plasmo-overflow-hidden plasmo-bg-white plasmo-text-slate-900">
-      <Navbar setMilitaryTime={setMilitaryTime} />
+      <Navbar militaryTime={militaryTime} setMilitaryTime={setMilitaryTime} setActiveTab={setActiveTab} onClearAllData={() => {setTrips([]), setActiveTab("home")}} />
       <main className="plasmo-px-4 plasmo-pr-5 plasmo-flex-1 plasmo-overflow-hidden">
         {activeTab === "home" &&  <HomeScreen onSelectTrip={(trip) => {setSelectedTrip(trip); setActiveTab("tripScreen")}} onCreateTrip={() => {setActiveTab("createTrip"); }} trips={trips}  />}
         {activeTab === "tripScreen" && selectedTrip &&  (
