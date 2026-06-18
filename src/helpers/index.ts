@@ -9,11 +9,23 @@ export const formatTime = (date: Date, militaryTime: boolean) =>
 
 export const determineGapHeight = (precedingArrivalTime: Date, followingDepartureTime: Date): number => {
   const gapMinutes = (followingDepartureTime.getTime() - precedingArrivalTime.getTime()) / (1000 * 60)
-  const minHeight = 40
-  const maxHeight = 120
-  const maxGapMinutes = 480
 
-  return Math.min(maxHeight, Math.max(minHeight, (gapMinutes / maxGapMinutes) * maxHeight))
+  const minHeight = 32
+  const thresholdHeight = 48   // height at the 6hr mark — below this, gaps barely grow
+  const maxHeight = 160
+  const thresholdMinutes = 360  // 6 hours — where "this matters" begins
+  const maxGapMinutes = 20160   // 14 days — beyond this, fully capped
+
+  if (gapMinutes <= thresholdMinutes) {
+    // sub-6hr: small linear ramp, stays compressed
+    const t = Math.max(0, gapMinutes - 30) / (thresholdMinutes - 30)
+    return minHeight + t * (thresholdHeight - minHeight)
+  }
+
+  // 6hr+: log growth from thresholdHeight up to maxHeight
+  const clamped = Math.min(maxGapMinutes, gapMinutes)
+  const t = Math.log(clamped / thresholdMinutes) / Math.log(maxGapMinutes / thresholdMinutes)
+  return thresholdHeight + t * (maxHeight - thresholdHeight)
 }
 
 export const fetchLocationPhoto = async (location: string): Promise<string | null> => {
@@ -31,13 +43,13 @@ export const fetchLocationPhoto = async (location: string): Promise<string | nul
 
 export const getEventStartTime = (event: TimelineEvent) => {
   if (event.type === "flight" || event.type === "daytrip") return new Date (event.departureTime)
-  else return event.checkIn
+  else return new Date(event.checkIn)
 }
 
 export const getEventEndTime = (event:TimelineEvent ) => {
   if (event.type === "flight") return new Date(event.arrivalTime)
   if (event.type === "daytrip") return new Date(event.returnTime.getTime() + (event.returnsNextDay ? 24 * 60 * 60 * 1000 : 0))
-  else return event.checkOut
+  else return new Date(event.checkOut)
 }
 
 export const sorted = (events: TimelineEvent[]) => [...events].sort((a,b) => // .sort() doesnt take a boolean like c++, if you return a negative number, a goes before, 0 = no change, and positive number means b goes before a.

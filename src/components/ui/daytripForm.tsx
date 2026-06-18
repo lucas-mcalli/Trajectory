@@ -11,6 +11,7 @@ import { InputGroup, InputGroupInput } from "./input-group"
 import type { TimelineEvent } from "~types"
 import { X } from "lucide-react"
 import { useRightPanel } from "~context/rightPanelContext"
+import { getEventEndTime } from "~helpers"
  
 
 const DaytripFormSchema = z.object({
@@ -26,7 +27,7 @@ const DaytripFormSchema = z.object({
 
 type DaytripFormValues = z.input<typeof DaytripFormSchema>
 
-export default function DaytripForm({ militaryTime, addEvents }: { militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void }) {
+export default function DaytripForm({ militaryTime, addEvents, rawEvents }: { militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, rawEvents: TimelineEvent[] }) {
 
   const [showConfirmationField, setShowConfirmationField] = React.useState(false)
 
@@ -58,6 +59,9 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
 
   const { setPanel } = useRightPanel()
 
+  const mostRecentEvent = rawEvents.length > 0 ? rawEvents[rawEvents.length - 1] : undefined
+  const defaultMonth = mostRecentEvent ? getEventEndTime(mostRecentEvent) : undefined
+
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4 plasmo-w-full plasmo-max-w-md">
       <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
@@ -66,7 +70,6 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
       </div>
 
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        {/* Name input */}
           <Field className="plasmo-flex-[3]">
             <div className="plasmo-flex plasmo-justify-between plasmo-items-end">
               <FieldLabel>Name</FieldLabel>
@@ -79,7 +82,6 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
             </InputGroup>
           </Field>
 
-        {/* Departure block */}
         <div className="plasmo-flex plasmo-flex-col plasmo-gap-1.5">
           <div className="plasmo-flex plasmo-items-center plasmo-justify-end plasmo-w-full">
             
@@ -118,10 +120,10 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
             militaryTime={militaryTime}
             error={form.formState.errors.departureTime?.message}
             onOpen={() => form.clearErrors(`departureTime`)}
+            defaultMonth={defaultMonth}
           />
         </div>
 
-        {/* Return time block - exclusively uses TimePicker now */}
           <TimePicker
             value={form.watch("returnTime")}
             label="Return Time"
@@ -132,7 +134,6 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
             onOpen={() => form.clearErrors(`returnTime`)}
           />
 
-        {/* Conditional Optional Confirmation Field Row */}
         {showConfirmationField ? (
           <Field>
             <FieldLabel>Confirmation Link</FieldLabel>
@@ -158,7 +159,6 @@ export default function DaytripForm({ militaryTime, addEvents }: { militaryTime:
           </button>
         )}
 
-        {/* Save CTA */}
         <button
           type="submit"
           className="plasmo-bg-primary plasmo-text-white plasmo-text-p plasmo-font-semibold plasmo-w-fit plasmo-h-8 plasmo-rounded-md plasmo-px-3 plasmo-self-end plasmo-mt-2"
