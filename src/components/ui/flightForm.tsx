@@ -11,6 +11,7 @@ import { Field, FieldLabel } from "~/components/ui/field"
 import { InputGroup, InputGroupInput } from "~components/ui/input-group"
 import { X } from "lucide-react"
 import { useRightPanel } from "~context/rightPanelContext"
+import { getEventEndTime } from "~helpers"
 
 const singleFlightSchema = z.object({
   origin: z.string().min(1, "Required"),
@@ -41,7 +42,7 @@ export const flightFormSchema = z.object({
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
-export default function FlightForm ({militaryTime, addEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void}) {
+export default function FlightForm ({militaryTime, addEvents, rawEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, rawEvents: TimelineEvent[]}) {
 
   const {setPanel} = useRightPanel()
 
@@ -69,20 +70,23 @@ export default function FlightForm ({militaryTime, addEvents}: {militaryTime: bo
     name: "flights"
   })
 
-const onSubmit = (values: FlightFormValues) => {
-  addEvents(values.flights.map(flight => ({
-    type: "flight" as const,
-    id: crypto.randomUUID(),
-    origin: flight.origin,
-    destination: flight.destination,
-    airline: flight.airline,
-    airlinePhoto: flight.airlinePhoto,
-    departureTime: flight.departureTime,
-    arrivalTime: flight.arrivalTime,
-    confirmationLink: values.confirmationLink || undefined
-  })))
-  setPanel('ambient')
-}
+  const onSubmit = (values: FlightFormValues) => {
+    addEvents(values.flights.map(flight => ({
+      type: "flight" as const,
+      id: crypto.randomUUID(),
+      origin: flight.origin,
+      destination: flight.destination,
+      airline: flight.airline,
+      airlinePhoto: flight.airlinePhoto,
+      departureTime: flight.departureTime,
+      arrivalTime: flight.arrivalTime,
+      confirmationLink: values.confirmationLink || undefined
+    })))
+    setPanel('ambient')
+  }
+
+  const mostRecentEvent = rawEvents.length > 0 ? rawEvents[rawEvents.length - 1] : undefined
+  const defaultMonth = mostRecentEvent ? getEventEndTime(mostRecentEvent) : undefined
 
 
   return (
@@ -140,6 +144,7 @@ const onSubmit = (values: FlightFormValues) => {
               militaryTime={militaryTime}
               error={form.formState.errors.flights?.[index]?.departureTime?.message}
               onOpen={() => form.clearErrors(`flights.${index}.departureTime`)}
+              defaultMonth={defaultMonth}
             />
 
             <DateTimePicker

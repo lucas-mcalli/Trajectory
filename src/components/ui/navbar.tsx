@@ -10,7 +10,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
 } from "~components/ui/alert-dialog"
 
 export const Navbar = ({ militaryTime, setMilitaryTime, setActiveTab, onClearAllData }: { militaryTime: boolean, setMilitaryTime: (value: boolean) => void, setActiveTab: (tab: "home" | "tripScreen" | "createTrip") => void, onClearAllData: () => void }) => {
@@ -68,40 +67,41 @@ export const Navbar = ({ militaryTime, setMilitaryTime, setActiveTab, onClearAll
             {militaryTime ? "Use AM-PM time" : "Use 24-hour time"}
           </button>
 
-          <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-            <AlertDialogTrigger asChild>
-              <button
-                onClick={() => setAlertOpen(true)}
-                className="plasmo-w-full plasmo-text-left plasmo-px-3 plasmo-py-2 plasmo-text-p plasmo-text-destructive hover:plasmo-bg-muted plasmo-transition-colors"
-              >
-                Clear all data
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Clear all data?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete all trips and events. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => { setAlertOpen(false); setMenuOpen(false) }}>
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    onClearAllData()
-                    setAlertOpen(false)
-                    setMenuOpen(false)
-                  }}
-                >
-                  Clear data
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <button
+            onClick={() => {
+              setAlertOpen(true)
+              setMenuOpen(false) // Safely close the dropdown menu immediately
+            }}
+            className="plasmo-w-full plasmo-text-left plasmo-px-3 plasmo-py-2 plasmo-text-p plasmo-text-destructive hover:plasmo-bg-muted plasmo-transition-colors"
+          >
+            Clear all data
+          </button>
         </div>
       )}
+
+      {/* alert dialog must be here (outside the conditional) so that it animates */}
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear all data?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all trips and events. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onClearAllData()
+              }}
+            >
+              Clear data
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </nav>
   )
 }

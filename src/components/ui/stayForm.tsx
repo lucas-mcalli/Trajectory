@@ -11,6 +11,7 @@ import CitiesCombobox from "./citiesCombobox"
 import type { TimelineEvent } from "~types"
 import { X } from "lucide-react"
 import { useRightPanel } from "~context/rightPanelContext"
+import { getEventEndTime } from "~helpers"
 
 const createStayFormSchema = (existingEvents: TimelineEvent[]) => z.object({
   name: z.string().min(1, "Required"),
@@ -43,7 +44,7 @@ const createStayFormSchema = (existingEvents: TimelineEvent[]) => z.object({
 
 type StayFormValues = z.infer<ReturnType<typeof createStayFormSchema>>
 
-export default function StayForm ({militaryTime, addEvents, events}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[]}) {
+export default function StayForm ({militaryTime, addEvents, events, rawEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[], rawEvents: TimelineEvent[]}) {
     const [showConfirmationField, setShowConfirmationField] = React.useState(false)
   const StayFormSchema = React.useMemo(() => createStayFormSchema(events), [events])
 
@@ -77,6 +78,9 @@ export default function StayForm ({militaryTime, addEvents, events}: {militaryTi
   }
 
   const { setPanel } = useRightPanel()
+
+  const mostRecentEvent = rawEvents.length > 0 ? rawEvents[rawEvents.length - 1] : undefined
+  const defaultMonth = mostRecentEvent ? getEventEndTime(mostRecentEvent) : undefined
 
 
   return (
@@ -118,7 +122,8 @@ export default function StayForm ({militaryTime, addEvents, events}: {militaryTi
           }}
           militaryTime={militaryTime}
           error={form.formState.errors.checkInTime?.message}
-          onOpen={() => form.clearErrors(`checkInTime`)}      
+          onOpen={() => form.clearErrors(`checkInTime`)} 
+          defaultMonth={defaultMonth}     
         />
 
         <DateTimePicker

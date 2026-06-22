@@ -4,7 +4,7 @@ import React from "react"
 import TripEvent from "~/components/ui/tripEvent"
 import { useStorage } from '@plasmohq/storage/hook'
 
-function TripEventStorageWrapper({ trip, onSelectTrip }: { trip: Trip, onSelectTrip: (trip: Trip) => void }) {
+function TripEventStorageWrapper({ trip, onSelectTrip, onDeleteTrip }: { trip: Trip, onSelectTrip: (trip: Trip) => void, onDeleteTrip: (tripId: string) => void }) {
   const [events] = useStorage<any[]>(`events-${trip.id}`, [])
   const normalizedEvents = (events || []).map((event) => // necessary to use the events array for each trip in storage.
     event.type === "flight" || event.type === "daytrip"
@@ -17,14 +17,16 @@ function TripEventStorageWrapper({ trip, onSelectTrip }: { trip: Trip, onSelectT
       trip={trip as any}
       events={normalizedEvents}
       onClick={() => onSelectTrip(trip)}
+      onDelete={() => onDeleteTrip(trip.id)}
     />
   )
 }
 
-export default function HomeScreen({ onSelectTrip, onCreateTrip, trips }: {
+export default function HomeScreen({ onSelectTrip, onCreateTrip, trips, onDeleteTrip }: {
   onSelectTrip: (trip: Trip) => void
   onCreateTrip: () => void
   trips: Trip[]
+  onDeleteTrip: (tripId: string) => void
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
@@ -45,6 +47,7 @@ export default function HomeScreen({ onSelectTrip, onCreateTrip, trips }: {
               key={trip.id}
               trip={trip}
               onSelectTrip={onSelectTrip}
+              onDeleteTrip={onDeleteTrip}
             />
           ))
         ) : (
