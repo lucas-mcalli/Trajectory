@@ -1,33 +1,121 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Trajectory
+
+A Chrome extension for visual trip planning. Build and manage travel itineraries through a chronological timeline, adding flights, stays, and day trips. Trajectory automatically arranges them with proportional gaps so you can see the full shape of your journey at a glance.
+
+![Trajectory](assets/icon.png)
+
+---
+
+## Features
+
+- **Visual timeline** — events arranged chronologically with proportional gap spacing that reflects actual elapsed time
+- **Three event types** — flights (with multi-leg support), hotel/accommodation stays, and day trips
+- **Destination cover photos** — pulled from Unsplash based on trip region
+- **Multiple trips** — create and manage separate trip cards from the home screen
+- **Fully local** — all data stored in `chrome.storage.sync`.
+
+---
+
+## Stack
+
+| | |
+|---|---|
+| Framework | [Plasmo](https://docs.plasmo.com/) |
+| UI | React + TypeScript |
+| Styling | Tailwind CSS (via `plasmo-` prefix) |
+| Components | shadcn/ui (manually configured) |
+| Forms | react-hook-form + Zod |
+| Storage | `@plasmohq/storage` |
+| Photos | Unsplash API |
+| Airline logos | [logo.dev](https://logo.dev) |
+| Country flags | [flagsapi.com](https://flagsapi.com) |
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- pnpm
+
+### Installation
+
+```bash
+git clone https://github.com/lucas-mcalli/trajectory.git
+cd trajectory
+pnpm install
+```
+
+### Environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+PLASMO_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_access_key
+```
+
+Get a free Unsplash API key at [unsplash.com/developers](https://unsplash.com/developers).
+
+### Development
 
 ```bash
 pnpm dev
-# or
-npm run dev
 ```
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+Then load the extension in Chrome:
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+1. Go to `chrome://extensions`
+2. Enable **Developer mode**
+3. Click **Load unpacked**
+4. Select the `build/chrome-mv3-dev` folder
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
-
-## Making production build
-
-Run the following:
+### Production build
 
 ```bash
-pnpm build
-# or
-npm run build
+pnpm package
 ```
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+Output is in `build/chrome-mv3-prod`.
 
-## Submit to the webstores
+---
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+## Project Structure
+
+```
+src/
+├── assets/          # SVG icons and wordmark
+├── components/
+│   ├── screens/     # HomeScreen, TripScreen, CreateTripScreen
+│   └── ui/          # Shared components (Navbar, DateTimePicker, event cards, forms)
+├── context/         # RightPanelContext
+├── data/            # airlines.json, regions.json, regionPreviews.json
+├── lib/             # utils (cn)
+├── types/           # index.ts — Trip, TimelineEvent, Flight, Stay, Daytrip
+├── helpers.ts       # Date utils, gap height, photo fetching, event sorting
+└── popup.tsx        # Extension entry point
+```
+
+---
+
+## Data Model
+
+All trip data is stored under `chrome.storage.sync` keyed by trip ID:
+
+- `"trips"` — `Trip[]` (id, name, regionId, coverPhotoUrl, createdAt)
+- `"events-{tripId}"` — `TimelineEvent[]` (Flight | Stay | Daytrip, each with a stable `id`)
+
+Events are stored independently from trips and sorted at render time.
+
+---
+
+## Known Limitations
+
+- The Unsplash free tier has rate limits (50 requests/hour). Cover photos may fail to load if the limit is hit.
+- `chrome.storage.sync` has a 100KB total quota. Very large trip datasets (many events across many trips) may approach this limit.
+
+---
+
+## License
+
+MIT
