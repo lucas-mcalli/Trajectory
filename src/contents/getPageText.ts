@@ -27,7 +27,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("[CONTENT] GET_PAGE_TEXT received")
 
   sendResponse({
-    text: getSanitizedPageText()
+    text: getSanitizedPageText(),
+    url: window.location.href
   })
 
   return true

@@ -136,3 +136,23 @@ export type Region = {
 }
 
 export type Tabs = "home" | "tripScreen" | "onboarding" | "createTrip"
+
+export type AlertConfig = {
+  title: string
+  description: string
+  cancelButton: boolean
+  cancelLabel?: string
+  actionLabel: string
+  onAction: () => void
+}
+
+export type AlertModalProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description: string
+  cancelButton?: boolean
+  cancelLabel?: string
+  actionLabel: string
+  onAction: () => void
+}

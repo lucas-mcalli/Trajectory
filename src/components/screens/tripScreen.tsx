@@ -3,7 +3,7 @@ import FlightForm from "~/components/ui/flightForm"
 import StayForm from "~/components/ui/stayForm"
 import DaytripForm from "~/components/ui/daytripForm"
 import type { TimelineEvent, Trip } from "~types"
-import React from "react"
+import React, { useState } from "react"
 import { useStorage } from "@plasmohq/storage/hook"
 import { useRightPanel } from "~context/rightPanelContext"
 import AmbientCard from "~components/ui/ambientCard"
@@ -12,6 +12,8 @@ import { sendToBackground } from "@plasmohq/messaging"
 
 
 export default function TripScreen({ trip, militaryTime }: { trip: Trip, militaryTime: boolean }) {
+
+  const [isAutofilling, setIsAutofilling] = useState(false) // this is used to set the autofill button loading state while the API is being called, to prevent multiple calls at once.
 
   function deserializeEvent(event: any): TimelineEvent { // This is necessary because dates are stored as strings in our events object. When the window is reopened, these strings must be constructed back into Date objects to use functions like getTime().
     switch (event.type) {
@@ -39,6 +41,7 @@ export default function TripScreen({ trip, militaryTime }: { trip: Trip, militar
   }
 
 const handleAutofill = async (onResult: (data: any) => void) => {
+  setIsAutofilling(true)
   try {
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -60,7 +63,7 @@ const handleAutofill = async (onResult: (data: any) => void) => {
     const apiResponse = await fetch("https://trajectory-api.lmcalli124.workers.dev/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: response.text })
+      body: JSON.stringify({ text: response.text, url: response.url })
     }).then(r => r.json())
 
     console.log("[POPUP] API response:", apiResponse)
@@ -68,6 +71,8 @@ const handleAutofill = async (onResult: (data: any) => void) => {
     onResult(apiResponse)
   } catch (error) {
     console.error("[POPUP] Error:", error)
+  } finally {
+    setIsAutofilling(false)
   }
 }
 
@@ -90,8 +95,8 @@ const handleAutofill = async (onResult: (data: any) => void) => {
       </div>
       <div style={{ scrollbarWidth: "none" }} className="USER EDIT SIDE plasmo-py-4 plasmo-overflow-y-auto plasmo-h-full plasmo-flex plasmo-flex-col plasmo-gap-10 plasmo-px-1">
         {panel === "ambient" && <AmbientCard trip={trip} events={events}/>}
-        {panel === "flight" && <FlightForm militaryTime={militaryTime} addEvents={addEvents} rawEvents={rawEvents} onAutofill={handleAutofill} />}
-        {panel === "stay" && <StayForm militaryTime={militaryTime} addEvents={addEvents} events={events} rawEvents={rawEvents} onAutofill={handleAutofill} />}
+        {panel === "flight" && <FlightForm militaryTime={militaryTime} addEvents={addEvents} rawEvents={rawEvents} onAutofill={handleAutofill} isAutofilling={isAutofilling} />}
+        {panel === "stay" && <StayForm militaryTime={militaryTime} addEvents={addEvents} events={events} rawEvents={rawEvents} onAutofill={handleAutofill} isAutofilling={isAutofilling} />}
         {panel === "daytrip" && <DaytripForm militaryTime={militaryTime} addEvents={addEvents} rawEvents={rawEvents} />}
       </div>
     </div>

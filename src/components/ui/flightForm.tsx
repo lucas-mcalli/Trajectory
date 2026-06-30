@@ -13,12 +13,16 @@ import Icon from '@mdi/react';
 import { mdiCreation } from '@mdi/js';
 import { useRightPanel } from "~context/rightPanelContext"
 import { getEventEndTime } from "~helpers"
+import { ALL_AIRLINES, getLogoUrl } from "~components/ui/airlineCombobox"
+import { Oval } from "react-loader-spinner"
+import { useAlert } from "~hooks/useAlert"
+import { AlertModal } from "~components/ui/alertModal"
 
 const singleFlightSchema = z.object({
   origin: z.string().min(1, "Required"),
   destination: z.string().min(1, "Required"),
   airline: z.string().min(1, "Required"),
-  airlinePhoto: z.url().min(1, "Required"),
+  airlinePhoto: z.url().optional().or(z.literal("")),
   departureTime: z.date({error: "Required"}),
   arrivalTime: z.date({ error: "Required" })
 })
@@ -29,6 +33,14 @@ const singleFlightSchema = z.object({
       code: "custom",
       message: "Arrival must be after departure",
       path: ["arrivalTime"]
+    })
+  }
+
+  if (data.origin === data.destination) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Origin and destination cannot be the same",
+      path: ["destination"]
     })
   }
 })
@@ -43,7 +55,7 @@ export const flightFormSchema = z.object({
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
-export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutofill}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, rawEvents: TimelineEvent[], onAutofill: (onResult: (data: any) => void) => void}) {
+export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutofill, isAutofilling}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, rawEvents: TimelineEvent[], onAutofill: (onResult: (data: any) => void) => void, isAutofilling: boolean}) {
 
   const {setPanel} = useRightPanel()
   const [showConfirmationField, setShowConfirmationField] = useState(false)
@@ -75,7 +87,7 @@ export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutof
       origin: flight.origin,
       destination: flight.destination,
       airline: flight.airline,
-      airlinePhoto: flight.airlinePhoto,
+      airlinePhoto: flight.airlinePhoto ?? "",
       departureTime: flight.departureTime,
       arrivalTime: flight.arrivalTime,
       confirmationLink: values.confirmationLink || undefined
@@ -85,7 +97,7 @@ export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutof
 
   const mostRecentEvent = rawEvents.length > 0 ? rawEvents[rawEvents.length - 1] : undefined
   const defaultMonth = mostRecentEvent ? getEventEndTime(mostRecentEvent) : undefined
-
+  const { alertOpen, setAlertOpen, alertContent, triggerAlert } = useAlert()
 
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4">
@@ -97,26 +109,53 @@ export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutof
         <button
           type="button"
           onClick={() => onAutofill((apiResponse) => {
-            const mapped = apiResponse.decision.flights.map((f: any) => ({
-              airline: f.airline,
-              airlinePhoto: "",
-              origin: f.origin,
-              destination: f.destination,
-              departureTime: new Date(f.departureTime),
-              arrivalTime: new Date(f.arrivalTime),
-              confirmationLink: ""
-            }))
-            replace(mapped)
+            if (apiResponse?.decision.type === "flights") {
+              const sharedConfirmationLink = apiResponse.decision.confirmationLink || ""
+              setShowConfirmationField(true)
+              form.setValue("confirmationLink", sharedConfirmationLink)
+              const mapped = apiResponse.decision.flights.map((f: any) => {
+                const match = ALL_AIRLINES.find(a => a.name.toLowerCase() === f.airline?.toLowerCase()) // makes the airlinePhoto appear in flightEvent and increases tolerance for slight differences in airline name formatting (e.g. "LEVEL" vs "Level")
+                return {
+                  airline: match? match.name : f.airline,
+                  airlinePhoto: match ? getLogoUrl(match.domain) : "",
+                  origin: f.origin,
+                  destination: f.destination,
+                  departureTime: new Date(f.departureTime),
+                  arrivalTime: new Date(f.arrivalTime),
+                }
+              })
+              replace(mapped)
+            }
+            else if (apiResponse?.decision?.type === "stay") {
+              triggerAlert({
+                title: "Event Mismatch",
+                description: "This page appears to contain a stay event, not a flight event. Please use the stay form instead.",
+                cancelButton: true,
+                cancelLabel: "Back",
+                actionLabel: "Switch to stay",
+                onAction: () => setPanel("stay")
+              })
+            }
+            else if (apiResponse?.decision?.type === "invalid") {
+              triggerAlert({
+                title: "Autofill Error",
+                description: apiResponse.decision.reason,
+                cancelButton: false,
+                actionLabel: "OK",
+                onAction: () => {}
+              })
+            }
           })}
-          // disabled={isAutofilling}
+          disabled={isAutofilling}
           className="plasmo-inline-flex plasmo-items-center plasmo-gap-1.5 plasmo-text-p plasmo-font-semibold plasmo-cursor-pointer plasmo-transition-opacity plasmo-bg-transparent"
           style={{ opacity: 0.75 }}
           onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
           onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")}
         >
-          <Icon path={mdiCreation} size={0.75} style={{ color: "#7c3aed" }} />
-          <span className="ai-gradient-text">Autofill from page</span>
+          {isAutofilling ? <Oval visible={true} height={16} width={16} strokeWidth={5} strokeWidthSecondary={5} color="#7c3aed" secondaryColor="#7c5cfa" /> : <Icon path={mdiCreation} size={0.75} style={{ color: "#7c3aed" }} />} 
+          {isAutofilling ? <span className="ai-gradient-text">Autofilling...</span> : <span className="ai-gradient-text">Autofill from page</span>}
         </button>
+        <AlertModal open={alertOpen} onOpenChange={setAlertOpen} {...alertContent} />
       </div>
       <form
         className="plasmo-flex plasmo-flex-col plasmo-gap-4"
@@ -223,7 +262,7 @@ export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutof
               value={form.watch(`flights.${index}.airline`)}
               onChange={(name, airlinePhoto) => {
                 form.setValue(`flights.${index}.airline`, name)
-                form.setValue(`flights.${index}.airlinePhoto`, airlinePhoto)
+                name !== "Other" && form.setValue(`flights.${index}.airlinePhoto`, airlinePhoto)
               }}
               error={form.formState.errors.flights?.[index]?.airline?.message}
               onOpen={() => form.clearErrors(`flights.${index}.airline`)}

@@ -30,7 +30,7 @@ export default function FlightEvent({ id, origin, destination, airline, airlineP
         <div className="plasmo-absolute plasmo-bottom-0 plasmo-left-0 plasmo-w-full plasmo-px-2 plasmo-pb-2 plasmo-flex plasmo-justify-between plasmo-items-end">
           <div className="plasmo-flex plasmo-flex-col">
             <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
-              <img src={airlinePhoto} className="plasmo-size-4 plasmo-rounded-sm plasmo-object-contain plasmo-shrink-0"/>
+              {airlinePhoto && <img src={airlinePhoto} className="plasmo-size-4 plasmo-rounded-sm plasmo-object-contain plasmo-shrink-0"/>}
               <span className="plasmo-text-foreground plasmo-text-p plasmo-font-normal">{airline}</span>
             </div>
             <span className="plasmo-text-foreground plasmo-text-p">

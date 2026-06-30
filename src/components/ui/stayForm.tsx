@@ -14,6 +14,9 @@ import { useRightPanel } from "~context/rightPanelContext"
 import { getEventEndTime } from "~helpers"
 import LOCATIONS_DATA from "~/data/cities.json"
 import type { LocationEntry } from "~/types"
+import { Oval } from "react-loader-spinner"
+import { useAlert } from "~hooks/useAlert"
+import { AlertModal } from "~components/ui/alertModal"
 
 const ALL_LOCATIONS: LocationEntry[] = LOCATIONS_DATA as LocationEntry[]
 
@@ -47,7 +50,7 @@ const createStayFormSchema = (existingEvents: TimelineEvent[]) => z.object({
 
 type StayFormValues = z.infer<ReturnType<typeof createStayFormSchema>>
 
-export default function StayForm ({militaryTime, addEvents, events, rawEvents, onAutofill}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[], rawEvents: TimelineEvent[], onAutofill: (onResult: (data: any) => void) => void}) {
+export default function StayForm ({militaryTime, addEvents, events, rawEvents, onAutofill, isAutofilling}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[], rawEvents: TimelineEvent[], onAutofill: (onResult: (data: any) => void) => void, isAutofilling: boolean}) {
     const [showConfirmationField, setShowConfirmationField] = React.useState(false)
   const StayFormSchema = React.useMemo(() => createStayFormSchema(events), [events])
 
@@ -82,6 +85,7 @@ export default function StayForm ({militaryTime, addEvents, events, rawEvents, o
 
   const mostRecentEvent = rawEvents.length > 0 ? rawEvents[rawEvents.length - 1] : undefined
   const defaultMonth = mostRecentEvent ? getEventEndTime(mostRecentEvent) : undefined
+  const { alertOpen, setAlertOpen, alertContent, triggerAlert } = useAlert()
 
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4">
@@ -93,23 +97,47 @@ export default function StayForm ({militaryTime, addEvents, events, rawEvents, o
         <button
           type="button"
           onClick={() => onAutofill((apiResponse) => {
-            const stay = apiResponse.decision
-            const match = ALL_LOCATIONS.find(loc => loc.city.toLowerCase() === stay.city.toLowerCase() && loc.country.toLowerCase() === stay.country.toLowerCase())
-            form.setValue("name", stay.name)
-            form.setValue("checkInTime", new Date(stay.checkIn))
-            form.setValue("checkOutTime", new Date(stay.checkOut))
-            form.setValue("location", `${stay.city}, ${stay.country}`)
-            form.setValue("flagLink", match?.flag ?? "")
+            if (apiResponse?.decision?.type === "stay") {
+              const stay = apiResponse.decision
+              const match = ALL_LOCATIONS.find(loc => loc.city.toLowerCase() === stay.city.toLowerCase() && loc.country.toLowerCase() === stay.country.toLowerCase())
+              setShowConfirmationField(true)
+              form.setValue("name", stay.name)
+              form.setValue("checkInTime", new Date(stay.checkIn))
+              form.setValue("checkOutTime", new Date(stay.checkOut))
+              form.setValue("location", `${stay.city}, ${stay.country}`)
+              form.setValue("flagLink", match?.flag ?? "")
+              form.setValue("confirmationLink", stay.confirmationLink ?? "")
+            }
+            else if (apiResponse?.decision?.type === "flights") {
+              triggerAlert({
+                title: "Event Mismatch",
+                description: "This page appears to contain a flight event, not a stay event. Please use the flight form instead.",
+                cancelButton: true,
+                cancelLabel: "Back",
+                actionLabel: "Switch to flight",
+                onAction: () => setPanel("flight")
+              })
+            }
+            else if (apiResponse?.decision?.type === "invalid") {
+              triggerAlert({
+                title: "Autofill Error",
+                description: apiResponse.decision.reason,
+                cancelButton: false,
+                actionLabel: "OK",
+                onAction: () => {}
+              })
+            }
           })}
-          // disabled={isAutofilling}
+          disabled={isAutofilling}
           className="plasmo-inline-flex plasmo-items-center plasmo-gap-1.5 plasmo-text-p plasmo-font-semibold plasmo-cursor-pointer plasmo-transition-opacity plasmo-bg-transparent"
           style={{ opacity: 0.75 }}
           onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
           onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")}
         >
-          <Icon path={mdiCreation} size={0.75} style={{ color: "#7c3aed" }} />
-          <span className="ai-gradient-text">Autofill from page</span>
+          {isAutofilling ? <Oval visible={true} height={16} width={16} strokeWidth={5} strokeWidthSecondary={5} color="#7c3aed" secondaryColor="#7c5cfa" /> : <Icon path={mdiCreation} size={0.75} style={{ color: "#7c3aed" }} />}
+          {isAutofilling ? <span className="ai-gradient-text">Autofilling...</span> : <span className="ai-gradient-text">Autofill from page</span>}
         </button>
+        <AlertModal open={alertOpen} onOpenChange={setAlertOpen} {...alertContent} />
       </div>
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="plasmo-flex plasmo-gap-4">

@@ -6,9 +6,9 @@ import type { AirlineComboboxProps } from "~/types"
 import AIRLINES_DATA from "~/data/airlines.json"
 import type { AirlineEntry } from "~/types"
 
-const ALL_AIRLINES: AirlineEntry[] = AIRLINES_DATA as AirlineEntry[]
+export const ALL_AIRLINES: AirlineEntry[] = AIRLINES_DATA as AirlineEntry[]
 
-function getLogoUrl(domain: string): string {
+export function getLogoUrl(domain: string): string {
   return `https://img.logo.dev/${domain}?token=pk_E9UJ86JlTC6zyB-Jpd9veQ`
 }
 
