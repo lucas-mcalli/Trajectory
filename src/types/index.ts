@@ -16,7 +16,6 @@ export type Stay = {
   type: "stay"
   id: string
   name: string
-  guests: number
   checkIn: Date
   checkOut: Date
   location: string

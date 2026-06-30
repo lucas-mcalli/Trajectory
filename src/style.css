@@ -83,3 +83,20 @@
     transition: box-shadow 0.1s ease;
   }
 }
+
+@keyframes ai-gradient-shift {
+  0%   { background-position: 0% 50%; }
+  25%  { background-position: 100% 0%; }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+.ai-gradient-text {
+  background: linear-gradient(135deg, #7c3aed, #9333ea, #e94d99, #7c3aed);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ai-gradient-shift 15s ease infinite;
+}

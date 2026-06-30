@@ -7,7 +7,7 @@
     ".plasmo/index.d.ts",
     "./**/*.ts",
     "./**/*.tsx"
-  ],
+, "src/contents"  ],
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
     "paths": {
@@ -16,6 +16,7 @@
       ]
     },
     "baseUrl": ".",
-    "strict": true
+    "strict": true,
+    "types": ["chrome"]
   }
 }

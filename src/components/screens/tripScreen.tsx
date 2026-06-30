@@ -3,10 +3,12 @@ import FlightForm from "~/components/ui/flightForm"
 import StayForm from "~/components/ui/stayForm"
 import DaytripForm from "~/components/ui/daytripForm"
 import type { TimelineEvent, Trip } from "~types"
-import React, { useState } from "react"
+import React from "react"
 import { useStorage } from "@plasmohq/storage/hook"
 import { useRightPanel } from "~context/rightPanelContext"
 import AmbientCard from "~components/ui/ambientCard"
+import { sendToBackground } from "@plasmohq/messaging"
+ 
 
 
 export default function TripScreen({ trip, militaryTime }: { trip: Trip, militaryTime: boolean }) {
@@ -36,6 +38,39 @@ export default function TripScreen({ trip, militaryTime }: { trip: Trip, militar
     }
   }
 
+const handleAutofill = async (onResult: (data: any) => void) => {
+  try {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    })
+
+    if (!tab?.id) {
+      throw new Error("No active tab")
+    }
+
+    console.log("[POPUP] Active tab:", tab)
+
+    const response = await chrome.tabs.sendMessage(tab.id, {
+      type: "GET_PAGE_TEXT"
+    })
+
+    console.log(response)
+    
+    const apiResponse = await fetch("https://trajectory-api.lmcalli124.workers.dev/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: response.text })
+    }).then(r => r.json())
+
+    console.log("[POPUP] API response:", apiResponse)
+    
+    onResult(apiResponse)
+  } catch (error) {
+    console.error("[POPUP] Error:", error)
+  }
+}
+
   const [rawEvents, setEvents] = useStorage<any[]>(`events-${trip.id}`, []) // events will now persist in chrome.storage.sync because of useStorage !
   const events : TimelineEvent[] = (rawEvents ?? []).map(deserializeEvent) // this is what turns the strings into Dates on reopen
   const { panel } = useRightPanel() // imported from context/rightPanelContext, this dictates what's on the right side panel based on the user's actions on the timeline.
@@ -55,8 +90,8 @@ export default function TripScreen({ trip, militaryTime }: { trip: Trip, militar
       </div>
       <div style={{ scrollbarWidth: "none" }} className="USER EDIT SIDE plasmo-py-4 plasmo-overflow-y-auto plasmo-h-full plasmo-flex plasmo-flex-col plasmo-gap-10 plasmo-px-1">
         {panel === "ambient" && <AmbientCard trip={trip} events={events}/>}
-        {panel === "flight" && <FlightForm militaryTime={militaryTime} addEvents={addEvents} rawEvents={rawEvents} />}
-        {panel === "stay" && <StayForm militaryTime={militaryTime} addEvents={addEvents} events={events} rawEvents={rawEvents} />}
+        {panel === "flight" && <FlightForm militaryTime={militaryTime} addEvents={addEvents} rawEvents={rawEvents} onAutofill={handleAutofill} />}
+        {panel === "stay" && <StayForm militaryTime={militaryTime} addEvents={addEvents} events={events} rawEvents={rawEvents} onAutofill={handleAutofill} />}
         {panel === "daytrip" && <DaytripForm militaryTime={militaryTime} addEvents={addEvents} rawEvents={rawEvents} />}
       </div>
     </div>

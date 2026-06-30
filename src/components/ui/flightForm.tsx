@@ -2,14 +2,15 @@ import * as z from "zod"
 import { useState } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-
 import { DateTimePicker } from "~components/ui/dateTimePicker"
 import AirportCombobox from "~components/ui/airportCombobox"
 import AirlineCombobox from "~components/ui/airlineCombobox"
 import type { TimelineEvent } from "~types"
 import { Field, FieldLabel } from "~/components/ui/field"
 import { InputGroup, InputGroupInput } from "~components/ui/input-group"
-import { X } from "lucide-react"
+import { ChevronLeft} from "lucide-react"
+import Icon from '@mdi/react';
+import { mdiCreation } from '@mdi/js';
 import { useRightPanel } from "~context/rightPanelContext"
 import { getEventEndTime } from "~helpers"
 
@@ -17,7 +18,7 @@ const singleFlightSchema = z.object({
   origin: z.string().min(1, "Required"),
   destination: z.string().min(1, "Required"),
   airline: z.string().min(1, "Required"),
-  airlinePhoto: z.url(),
+  airlinePhoto: z.url().min(1, "Required"),
   departureTime: z.date({error: "Required"}),
   arrivalTime: z.date({ error: "Required" })
 })
@@ -42,15 +43,12 @@ export const flightFormSchema = z.object({
 
 type FlightFormValues = z.infer<typeof flightFormSchema>
 
-export default function FlightForm ({militaryTime, addEvents, rawEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, rawEvents: TimelineEvent[]}) {
+export default function FlightForm ({militaryTime, addEvents, rawEvents, onAutofill}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, rawEvents: TimelineEvent[], onAutofill: (onResult: (data: any) => void) => void}) {
 
   const {setPanel} = useRightPanel()
-
   const [showConfirmationField, setShowConfirmationField] = useState(false)
-
   const form = useForm<FlightFormValues>({
     resolver: zodResolver(flightFormSchema),
-
     defaultValues: {
       flights: [
         {
@@ -65,7 +63,7 @@ export default function FlightForm ({militaryTime, addEvents, rawEvents}: {milit
     }
   })
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "flights"
   })
@@ -92,8 +90,33 @@ export default function FlightForm ({militaryTime, addEvents, rawEvents}: {milit
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4">
       <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
-        <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new flight</h1>
-        <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><X /></button>
+        <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
+          <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><ChevronLeft /></button>
+          <h1 className="plasmo-text-2xl plasmo-font-semibold">Add flight</h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => onAutofill((apiResponse) => {
+            const mapped = apiResponse.decision.flights.map((f: any) => ({
+              airline: f.airline,
+              airlinePhoto: "",
+              origin: f.origin,
+              destination: f.destination,
+              departureTime: new Date(f.departureTime),
+              arrivalTime: new Date(f.arrivalTime),
+              confirmationLink: ""
+            }))
+            replace(mapped)
+          })}
+          // disabled={isAutofilling}
+          className="plasmo-inline-flex plasmo-items-center plasmo-gap-1.5 plasmo-text-p plasmo-font-semibold plasmo-cursor-pointer plasmo-transition-opacity plasmo-bg-transparent"
+          style={{ opacity: 0.75 }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+          onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")}
+        >
+          <Icon path={mdiCreation} size={0.75} style={{ color: "#7c3aed" }} />
+          <span className="ai-gradient-text">Autofill from page</span>
+        </button>
       </div>
       <form
         className="plasmo-flex plasmo-flex-col plasmo-gap-4"

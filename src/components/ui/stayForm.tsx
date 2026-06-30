@@ -2,20 +2,23 @@ import * as z from "zod"
 import React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { User } from "lucide-react"
-
+import { ChevronLeft } from "lucide-react"
+import Icon from '@mdi/react';
+import { mdiCreation } from '@mdi/js';
 import { DateTimePicker } from "~components/ui/dateTimePicker"
 import { Field, FieldLabel } from "./field"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group"
+import { InputGroup, InputGroupInput } from "./input-group"
 import CitiesCombobox from "./citiesCombobox"
 import type { TimelineEvent } from "~types"
-import { X } from "lucide-react"
 import { useRightPanel } from "~context/rightPanelContext"
 import { getEventEndTime } from "~helpers"
+import LOCATIONS_DATA from "~/data/cities.json"
+import type { LocationEntry } from "~/types"
+
+const ALL_LOCATIONS: LocationEntry[] = LOCATIONS_DATA as LocationEntry[]
 
 const createStayFormSchema = (existingEvents: TimelineEvent[]) => z.object({
   name: z.string().min(1, "Required"),
-  guests: z.number().min(1, { error: "At least 1 guest" }),
   location: z.string().min(1, "Required"),
   checkInTime: z.date({ error: "Required" }),
   checkOutTime: z.date({ error: "Required" }),
@@ -44,7 +47,7 @@ const createStayFormSchema = (existingEvents: TimelineEvent[]) => z.object({
 
 type StayFormValues = z.infer<ReturnType<typeof createStayFormSchema>>
 
-export default function StayForm ({militaryTime, addEvents, events, rawEvents}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[], rawEvents: TimelineEvent[]}) {
+export default function StayForm ({militaryTime, addEvents, events, rawEvents, onAutofill}: {militaryTime: boolean, addEvents: (event: TimelineEvent[]) => void, events: TimelineEvent[], rawEvents: TimelineEvent[], onAutofill: (onResult: (data: any) => void) => void}) {
     const [showConfirmationField, setShowConfirmationField] = React.useState(false)
   const StayFormSchema = React.useMemo(() => createStayFormSchema(events), [events])
 
@@ -52,7 +55,6 @@ export default function StayForm ({militaryTime, addEvents, events, rawEvents}: 
     resolver: zodResolver(StayFormSchema),
     defaultValues: {
       name: "",
-      guests: 1,
       location: "",
       checkInTime: undefined as unknown as Date,
       checkOutTime: undefined as unknown as Date,
@@ -67,7 +69,6 @@ export default function StayForm ({militaryTime, addEvents, events, rawEvents}: 
       type: "stay",
       id: crypto.randomUUID(),
       name: values.name,
-      guests: values.guests,
       location: values.location,
       checkIn: values.checkInTime,
       checkOut: values.checkOutTime,
@@ -82,12 +83,33 @@ export default function StayForm ({militaryTime, addEvents, events, rawEvents}: 
   const mostRecentEvent = rawEvents.length > 0 ? rawEvents[rawEvents.length - 1] : undefined
   const defaultMonth = mostRecentEvent ? getEventEndTime(mostRecentEvent) : undefined
 
-
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-gap-4">
       <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
-        <h1 className="plasmo-text-2xl plasmo-font-semibold">Add new stay</h1>
-        <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><X /></button>
+        <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
+          <button className="plasmo-text-gray-600 hover:plasmo-text-destructive plasmo-transition-colors plasmo-duration-200 plasmo-ease-in-out" onClick={() => setPanel("ambient")}><ChevronLeft /></button>
+          <h1 className="plasmo-text-2xl plasmo-font-semibold">Add stay</h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => onAutofill((apiResponse) => {
+            const stay = apiResponse.decision
+            const match = ALL_LOCATIONS.find(loc => loc.city.toLowerCase() === stay.city.toLowerCase() && loc.country.toLowerCase() === stay.country.toLowerCase())
+            form.setValue("name", stay.name)
+            form.setValue("checkInTime", new Date(stay.checkIn))
+            form.setValue("checkOutTime", new Date(stay.checkOut))
+            form.setValue("location", `${stay.city}, ${stay.country}`)
+            form.setValue("flagLink", match?.flag ?? "")
+          })}
+          // disabled={isAutofilling}
+          className="plasmo-inline-flex plasmo-items-center plasmo-gap-1.5 plasmo-text-p plasmo-font-semibold plasmo-cursor-pointer plasmo-transition-opacity plasmo-bg-transparent"
+          style={{ opacity: 0.75 }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+          onMouseLeave={e => (e.currentTarget.style.opacity = "0.75")}
+        >
+          <Icon path={mdiCreation} size={0.75} style={{ color: "#7c3aed" }} />
+          <span className="ai-gradient-text">Autofill from page</span>
+        </button>
       </div>
       <form className="plasmo-flex plasmo-flex-col plasmo-gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="plasmo-flex plasmo-gap-4">
@@ -100,15 +122,6 @@ export default function StayForm ({militaryTime, addEvents, events, rawEvents}: 
             </div>
             <InputGroup>
               <InputGroupInput {...form.register("name")} aria-invalid={!!form.formState.errors.name} />
-            </InputGroup>
-          </Field>
-          <Field className="plasmo-flex-1">
-            <FieldLabel>Guests</FieldLabel>
-            <InputGroup>
-              <InputGroupInput {...form.register("guests", { valueAsNumber: true })} type="number" min="1" />
-              <InputGroupAddon align="inline-end">
-                <User className="plasmo-size-4" />
-              </InputGroupAddon>
             </InputGroup>
           </Field>
         </div>
