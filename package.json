@@ -1,7 +1,7 @@
 {
   "name": "trajectory",
   "displayName": "Trajectory",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Visualized travel planner",
   "author": "Lucas McAllister",
   "license": "MIT",
